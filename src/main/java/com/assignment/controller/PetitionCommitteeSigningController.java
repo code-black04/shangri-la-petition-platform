@@ -28,7 +28,7 @@ public class PetitionCommitteeSigningController {
     @RequestMapping(path = "/login",
             method = RequestMethod.POST,
             produces = "application/json")
-    public ResponseEntity<MessageDto> signInUser(
+    public ResponseEntity<MessageDto> signInPetitionCommittee(
             @NonNull @RequestParam String emailId,
             @NonNull @RequestParam String password
     ) {

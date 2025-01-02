@@ -14,6 +14,7 @@ services:
       - "5432:5432"
     volumes:
       - "shangri-la-petition-platform-db-data:/var/lib/postgresql/data"
+      - "./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql"
 
   app:
     container_name: shangri-la-petition-platform-container
