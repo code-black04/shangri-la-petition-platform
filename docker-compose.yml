@@ -15,6 +15,11 @@ services:
     volumes:
       - "shangri-la-petition-platform-db-data:/var/lib/postgresql/data"
       - "./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slpp-user -d slpp-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     container_name: shangri-la-petition-platform-container
