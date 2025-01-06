@@ -30,15 +30,14 @@ public class PetitionController {
             method = RequestMethod.POST,
             consumes = { "application/json" },
             produces = { "application/json" })
-    public ResponseEntity<MessageDto> createPetition(
+    public ResponseEntity<PetitionDto> createPetition(
             @RequestBody @Valid PetitionDto petitionDto
     ) {
         log.info("Request: {}", petitionDto);//Mask password value from user to be logged from
         PetitionDto petitionCreated = petitionService.createPetition(petitionDto);
-        ResponseEntity<MessageDto> response = null;
+        ResponseEntity<PetitionDto> response = null;
         if (petitionCreated != null) {
-            MessageDto message = new MessageDto(HttpStatus.CREATED, "Created new Petition");
-            response = new ResponseEntity<>(message, HttpStatus.CREATED);
+            response = new ResponseEntity<>(petitionCreated, HttpStatus.CREATED);
             log.info("Response: {}", response);
         }
         return response;
