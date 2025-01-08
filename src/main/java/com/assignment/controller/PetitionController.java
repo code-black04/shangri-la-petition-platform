@@ -2,6 +2,7 @@ package com.assignment.controller;
 
 import com.assignment.dto.MessageDto;
 import com.assignment.dto.PetitionDto;
+import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.service.PetitionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +27,17 @@ public class PetitionController {
         this.petitionService = petitionService;
     }
 
-    @RequestMapping(path = "/",
+    @RequestMapping(path = "/create",
             method = RequestMethod.POST,
             consumes = { "application/json" },
             produces = { "application/json" })
     public ResponseEntity<PetitionDto> createPetition(
             @RequestBody @Valid PetitionDto petitionDto
     ) {
-        log.info("Request: {}", petitionDto);//Mask password value from user to be logged from
+        petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);
+        petitionDto.setSignature(0);
+        petitionDto.setResponse(null);
+        log.info("Request: {}", petitionDto);
         PetitionDto petitionCreated = petitionService.createPetition(petitionDto);
         ResponseEntity<PetitionDto> response = null;
         if (petitionCreated != null) {
