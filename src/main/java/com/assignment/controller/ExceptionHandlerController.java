@@ -1,9 +1,6 @@
 package com.assignment.controller;
 
-import com.assignment.exception.BadRequestException;
-import com.assignment.exception.DuplicateAccountException;
-import com.assignment.exception.IncorrectPasswordException;
-import com.assignment.exception.UserNotFoundException;
+import com.assignment.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,6 +49,16 @@ public class ExceptionHandlerController {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(PetitionNotFoundException.class)
+    public ResponseEntity<Object> handlePetitionNotFound(PetitionNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "ERR_PETITION_NOT_FOUND",
+                List.of(new ErrorMessage("petition_not_found", ex.getMessage())),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
