@@ -4,6 +4,7 @@ import com.assignment.dto.MessageDto;
 import com.assignment.dto.PetitionerDto;
 import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.service.PetitionerSigningService;
+import com.assignment.utils.BiometricIdManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,12 @@ public class PetitionerSigningController {
 
     private final PetitionerSigningService petitionerSigningService;
 
-    public PetitionerSigningController(PetitionerSigningService petitionerSigningService) {
+    private final BiometricIdManager biometricIdManager;
+
+    public PetitionerSigningController(PetitionerSigningService petitionerSigningService,
+                                       BiometricIdManager biometricIdManager) {
         this.petitionerSigningService = petitionerSigningService;
+        this.biometricIdManager = biometricIdManager;
     }
 
     @RequestMapping(path = "/signup",
@@ -32,7 +37,18 @@ public class PetitionerSigningController {
     public ResponseEntity<MessageDto> signUpPetitioner(
             @RequestBody @Valid PetitionerDto petitionerDto
     ) {
-        log.info("Request: {}", petitionerDto);//Mask password value from user to be logged from
+        log.info("Request: {}", petitionerDto);
+
+        String biometricId = petitionerDto.getBiometricId();
+
+        if (!biometricIdManager.useBiometricId(biometricId)) {
+            // Validate and remove the biometric ID
+            if (!biometricIdManager.useBiometricId(biometricId)) {
+                log.error("Invalid biometric ID: {}", biometricId);
+                return new ResponseEntity<>(new MessageDto(HttpStatus.BAD_REQUEST, "Invalid biometric ID"), HttpStatus.BAD_REQUEST);
+            }
+        }
+
         PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
         ResponseEntity<MessageDto> response = null;
         if (userDto != null) {
