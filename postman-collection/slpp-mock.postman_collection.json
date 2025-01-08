@@ -1,0 +1,221 @@
+{
+	"info": {
+		"_postman_id": "e21a8831-bf5e-41db-9869-b144075042ea",
+		"name": "slpp-mock",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "17313789"
+	},
+	"item": [
+		{
+			"name": "Petitioner",
+			"item": [
+				{
+					"name": "Petitioner Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>Response Message</th>",
+									"    </tr>",
+									"    <tr>",
+									"        <td>{{response.responseMessage}}</td>",
+									"    </tr>",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return { response: pm.response.json() }",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Purnima\",\n    \"lastName\": \"Maheshwari\",\n    \"dateOfBirth\": \"2025-01-02\",\n    \"emailId\": \"pm455@gmail.com\",\n    \"password\":\"Buzzinga0402@1234\",\n    \"biometricId\": \"Purnima@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/petitioner/auth/signup"
+					},
+					"response": []
+				},
+				{
+					"name": "Petitioner Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>Response Message</th>",
+									"    </tr>",
+									"    <tr>",
+									"        <td>{{response.responseMessage}}</td>",
+									"    </tr>",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return { response: pm.response.json() }",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/petitioner/auth/login?emailId=pm455@gmail.com&password=Buzzinga0402@1234",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"petitioner",
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "emailId",
+									"value": "pm455@gmail.com"
+								},
+								{
+									"key": "password",
+									"value": "Buzzinga0402@1234"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreatePetition",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"petition_id\": \"1\",\n    \"status\": \"closed\",\n    \"petition_title\": \"Increase Funding for Primary Care in SLHS in the 2025 Budget\",\n    \"petition_text\": \"The Shangri-La government should consider increasing the funds allocated to primary care in the 2025 budget for the Shangri-La Health Service (SLHS)...\",\n    \"petitioner\": \"johnsmith@gmail.com\",\n    \"signatures\": \"999\",\n    \"response\": \"Parliamentary debates Note: the government will consider the proposal if...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/slpp/petitions/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Petition Committee",
+			"item": [
+				{
+					"name": "Petition Committe Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>Response Message</th>",
+									"    </tr>",
+									"    <tr>",
+									"        <td>{{response.responseMessage}}</td>",
+									"    </tr>",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return { response: pm.response.json() }",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8090/petition-committee/auth/login?emailId=admin@petition.parliament.sr&password=2025@shangrila",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8090",
+							"path": [
+								"petition-committee",
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "emailId",
+									"value": "admin@petition.parliament.sr"
+								},
+								{
+									"key": "password",
+									"value": "2025@shangrila"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
