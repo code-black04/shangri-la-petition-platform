@@ -3,6 +3,7 @@ package com.assignment.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 public class PetitionDto {
 
@@ -11,6 +12,9 @@ public class PetitionDto {
 
     @JsonProperty(value = "status")
     private PetitionStatusEnum petitionStatusEnum;
+
+    @JsonProperty(value = "petition_date")
+    private LocalDate petitionDate;
 
     @NotNull
     @NotEmpty
@@ -47,6 +51,14 @@ public class PetitionDto {
 
     public void setPetitionStatusEnum(PetitionStatusEnum petitionStatusEnum) {
         this.petitionStatusEnum = petitionStatusEnum;
+    }
+
+    public LocalDate getPetitionDate() {
+        return petitionDate;
+    }
+
+    public void setPetitionDate(LocalDate petitionDate) {
+        this.petitionDate = petitionDate;
     }
 
     public String getPetitionTitle() {
@@ -94,11 +106,12 @@ public class PetitionDto {
         return "PetitionDto{" +
                 "petitionId=" + petitionId +
                 ", petitionStatusEnum=" + petitionStatusEnum +
+                ", petitionDate=" + petitionDate +
                 ", petitionTitle='" + petitionTitle + '\'' +
                 ", petitionText='" + petitionText + '\'' +
                 ", petitioner='" + petitioner + '\'' +
                 ", signature=" + signature +
-                ", response=" + response +
+                ", response='" + response + '\'' +
                 '}';
     }
 }

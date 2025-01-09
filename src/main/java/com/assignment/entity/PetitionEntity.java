@@ -1,6 +1,9 @@
 package com.assignment.entity;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Table
 @Entity(name = "petition_entity")
@@ -14,6 +17,10 @@ public class PetitionEntity {
 
     @Column(name = "status")
     private String petitionStatusEnum;
+
+    @Column(name = "petition_date")
+    @CreatedDate
+    private LocalDate petitionDate;
 
     @Column(name = "petition_title")
     private String petitionTitle;
@@ -44,6 +51,14 @@ public class PetitionEntity {
 
     public void setPetitionStatusEnum(String petitionStatusEnum) {
         this.petitionStatusEnum = petitionStatusEnum;
+    }
+
+    public LocalDate getPetitionDate() {
+        return petitionDate;
+    }
+
+    public void setPetitionDate(LocalDate petitionDate) {
+        this.petitionDate = petitionDate;
     }
 
     public String getPetitionTitle() {

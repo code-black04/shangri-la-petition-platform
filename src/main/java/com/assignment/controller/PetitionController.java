@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -43,6 +44,7 @@ public class PetitionController {
         petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);
         petitionDto.setSignature(1);
         petitionDto.setResponse(null);
+        petitionDto.setPetitionDate(LocalDate.now());
         log.info("Request: {}", petitionDto);
         PetitionDto petitionCreated = petitionService.createPetition(petitionDto);
         ResponseEntity<PetitionDto> response = null;

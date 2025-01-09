@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,7 +25,7 @@ public class PetitionerDto {
     private String lastName;
 
     @JsonProperty(value = "dateOfBirth", required = true)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Email
     @NotEmpty
@@ -67,11 +68,11 @@ public class PetitionerDto {
         this.lastName = lastName;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

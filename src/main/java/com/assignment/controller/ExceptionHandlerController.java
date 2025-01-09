@@ -31,6 +31,15 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<Object> handleBadRequest(UnauthorizedAccessException exceptions){
+        ErrorResponse errorResponse = new ErrorResponse(
+                "ERR_UNAUTHORIZED_ACCESS",
+                List.of(new ErrorMessage("request", exceptions.getMessage())),
+                LocalDateTime.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
