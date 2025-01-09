@@ -1,6 +1,7 @@
 package com.assignment.controller;
 
 import com.assignment.dto.MessageDto;
+import com.assignment.dto.SigningInRequest;
 import com.assignment.dto.PetitionerDto;
 import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.service.PetitionerSigningService;
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -63,16 +63,15 @@ public class PetitionerSigningController {
             method = RequestMethod.POST,
             produces = "application/json")
     public ResponseEntity<MessageDto> signInUser(
-            @NonNull @RequestParam String emailId,
-            @NonNull @RequestParam String password
-    ) {
-        log.info("User with {} is trying to login", emailId);
-        Boolean isSignInSuccessful =  petitionerSigningService.signInPetitioner(emailId, password);
+            @RequestBody @Valid SigningInRequest signingInRequest
+            ) {
+        log.info("User with {} is trying to login", signingInRequest.getEmailId());
+        Boolean isSignInSuccessful =  petitionerSigningService.signInPetitioner(signingInRequest);
         if (!isSignInSuccessful) {
             log.error("Sign in was not successful");
             throw new UnauthorizedAccessException("Unauthorized login attempt");
         }
-        MessageDto message = new MessageDto(HttpStatus.OK, "Successful login by " + emailId);
+        MessageDto message = new MessageDto(HttpStatus.OK, "Successful login by " + signingInRequest.getEmailId());
         ResponseEntity<MessageDto> response = new ResponseEntity<>(message, HttpStatus.OK);
         log.info("Response: {}", response);
         return response;

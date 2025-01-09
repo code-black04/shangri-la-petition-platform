@@ -1,5 +1,6 @@
 package com.assignment.service;
 
+import com.assignment.dto.SigningInRequest;
 import com.assignment.entity.PetitionCommitteeEntity;
 import com.assignment.exception.IncorrectPasswordException;
 import com.assignment.exception.UnauthorizedAccessException;
@@ -48,18 +49,18 @@ public class PetitionCommitteeSigningServiceImpl implements PetitionCommitteeSig
     }
 
     @Override
-    public Boolean signInPetitionCommittee(String emailId, String password) throws UserNotFoundException, IncorrectPasswordException, UnauthorizedAccessException {
-        boolean isPetitionCommitteePresent = petitionCommitteeRepository.findPetitionCommitteeByEmailId(emailId) != null;
+    public Boolean signInPetitionCommittee(SigningInRequest signingInRequest) throws UserNotFoundException, IncorrectPasswordException, UnauthorizedAccessException {
+        boolean isPetitionCommitteePresent = petitionCommitteeRepository.findPetitionCommitteeByEmailId(signingInRequest.getEmailId()) != null;
         if (isPetitionCommitteePresent) {
-            boolean isPasswordMatching = petitionCommitteeRepository.findPetitionCommitteeByEmailId(emailId).getPassword().equals(password);
+            boolean isPasswordMatching = petitionCommitteeRepository.findPetitionCommitteeByEmailId(signingInRequest.getEmailId()).getPassword().equals(signingInRequest.getPassword());
             if (isPasswordMatching) {
                 return true;
             } else {
-                log.error("Incorrect password for user login: {}", emailId);
+                log.error("Incorrect password for user login: {}", signingInRequest.getEmailId());
                 throw new IncorrectPasswordException("Incorrect password");
             }
         } else {
-            log.error("Incorrect isPetitionerPresent: {}", emailId);
+            log.error("Incorrect isPetitionerPresent: {}", signingInRequest.getEmailId());
             throw new UserNotFoundException("Incorrect emailId");
         }
     }

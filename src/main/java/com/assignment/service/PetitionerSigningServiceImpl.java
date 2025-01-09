@@ -1,5 +1,6 @@
 package com.assignment.service;
 
+import com.assignment.dto.SigningInRequest;
 import com.assignment.dto.PetitionerDto;
 import com.assignment.entity.PetitionerEntity;
 import com.assignment.exception.DuplicateAccountException;
@@ -41,18 +42,18 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
     }
 
     @Override
-    public Boolean signInPetitioner(String emailId, String password) throws UserNotFoundException, IncorrectPasswordException, UnauthorizedAccessException {
-        boolean isPetitionerPresent = petitionerRepository.findPetitionerByEmailId(emailId) != null;
+    public Boolean signInPetitioner(SigningInRequest signingInRequest) throws UserNotFoundException, IncorrectPasswordException, UnauthorizedAccessException {
+        boolean isPetitionerPresent = petitionerRepository.findPetitionerByEmailId(signingInRequest.getEmailId()) != null;
         if (isPetitionerPresent) {
-            boolean isPasswordMatching = petitionerRepository.findPetitionerByEmailId(emailId).getPassword().equals(password);
+            boolean isPasswordMatching = petitionerRepository.findPetitionerByEmailId(signingInRequest.getEmailId()).getPassword().equals(signingInRequest.getPassword());
             if (isPasswordMatching) {
                 return true;
             } else {
-                log.error("Incorrect password for user login: {}", emailId);
+                log.error("Incorrect password for user login: {}", signingInRequest.getEmailId());
                 throw new IncorrectPasswordException("Incorrect password");
             }
         } else {
-            log.error("Incorrect isPetitionerPresent: {}", emailId);
+            log.error("Incorrect isPetitionerPresent: {}", signingInRequest.getEmailId());
             throw new UserNotFoundException("Incorrect emailId");
         }
     }
