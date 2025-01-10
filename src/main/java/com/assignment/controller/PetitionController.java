@@ -3,6 +3,7 @@ package com.assignment.controller;
 import com.assignment.dto.MessageDto;
 import com.assignment.dto.PetitionDto;
 import com.assignment.dto.PetitionStatusEnum;
+import com.assignment.exception.BadRequestException;
 import com.assignment.exception.PetitionNotFoundException;
 import com.assignment.service.PetitionService;
 import io.swagger.models.Response;
@@ -41,6 +42,15 @@ public class PetitionController {
     public ResponseEntity<PetitionDto> createPetition(
             @RequestBody @Valid PetitionDto petitionDto
     ) {
+        if (!petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
+            throw new BadRequestException("The petition cannot be closed upon creation. Please set the status to 'Open'.");
+        }
+        if (petitionDto.getSignature() != 1) {
+            throw new BadRequestException("The number of signatures must be exactly 1, indicating your support for the petition.");
+        }
+        if (petitionDto.getResponse() != null) {
+            throw  new BadRequestException("Only the petition committee can publish a response. Please leave the response field empty.");
+        }
         petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);
         petitionDto.setSignature(1);
         petitionDto.setResponse(null);
@@ -49,8 +59,11 @@ public class PetitionController {
         PetitionDto petitionCreated = petitionService.createPetition(petitionDto);
         ResponseEntity<PetitionDto> response = null;
         if (petitionCreated != null) {
+            log.info("Petition successfully created: {}", petitionCreated);
             response = new ResponseEntity<>(petitionCreated, HttpStatus.CREATED);
-            log.info("Response: {}", response);
+        } else {
+            log.warn("Petition creation failed. No petition was created.");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return response;
     }

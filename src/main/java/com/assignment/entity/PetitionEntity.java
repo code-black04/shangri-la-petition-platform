@@ -34,7 +34,7 @@ public class PetitionEntity {
     @Column(name = "signature")
     private Integer signature;
 
-    @Column(name = "response", updatable = false)
+    @Column(name = "response")
     private String response;
 
     public Integer getPetitionerId() {
