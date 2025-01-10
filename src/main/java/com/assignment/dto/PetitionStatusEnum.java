@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PetitionStatusEnum {
-    OPEN("open"),
-    CLOSED("closed"),
-    PENDING("pending");
+    OPEN("Open"),
+    CLOSED("Closed"),
+    PENDING("Pending");
 
     private final String value;
 
