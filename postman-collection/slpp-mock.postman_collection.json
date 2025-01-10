@@ -51,7 +51,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"Purnima\",\n    \"lastName\": \"Maheshwari\",\n    \"dateOfBirth\": \"2025-01-02\",\n    \"emailId\": \"pm455@gmail.com\",\n    \"password\":\"Buzzinga0402@1234\",\n    \"biometricId\": \"Purnima@123\"\n}",
+							"raw": "{\n    \"firstName\": \"Purnima\",\n    \"lastName\": \"Maheshwari\",\n    \"dateOfBirth\": \"2025-01-02\",\n    \"emailId\": \"pm455@gmail.com\",\n    \"password\":\"Buzzinga0402@\",\n    \"biometricId\": \"4HTOAI9YKO\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -102,27 +102,16 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/petitioner/auth/login?emailId=pm455@gmail.com&password=Buzzinga0402@1234",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"petitioner",
-								"auth",
-								"login"
-							],
-							"query": [
-								{
-									"key": "emailId",
-									"value": "pm455@gmail.com"
-								},
-								{
-									"key": "password",
-									"value": "Buzzinga0402@1234"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"emailId\": \"pm455@gmail.com\",\n    \"password\":\"Buzzinga0402@\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
-						}
+							}
+						},
+						"url": "{{url}}/petitioner/auth/login"
 					},
 					"response": []
 				},
@@ -133,14 +122,47 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"petition_id\": \"1\",\n    \"status\": \"closed\",\n    \"petition_title\": \"Increase Funding for Primary Care in SLHS in the 2025 Budget\",\n    \"petition_text\": \"The Shangri-La government should consider increasing the funds allocated to primary care in the 2025 budget for the Shangri-La Health Service (SLHS)...\",\n    \"petitioner\": \"johnsmith@gmail.com\",\n    \"signatures\": \"999\",\n    \"response\": \"Parliamentary debates Note: the government will consider the proposal if...\"\n}",
+							"raw": "{\n    \"petition_id\":\"1\",\n    \"status\": \"open\",\n    \"petition_title\": \"Increase Funding for Primary Care in SLHS in the 2025 Budget\",\n    \"petition_text\": \"The Shangri-La government should consider increasing the funds allocated to primary care in the 2025 budget for the Shangri-La Health Service (SLHS)...\",\n    \"petitioner\": \"johnsmith@gmail.com\",\n    \"signatures\": \"999\",\n    \"response\": \"Parliamentary debates Note: the government will consider the proposal if...\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": "{{url}}/slpp/petitions/"
+						"url": "{{url}}/slpp/petitions/create"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllPetitions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{url}}/slpp/petitions"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllPetitionsByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/slpp/petition?status=closed",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"slpp",
+								"petition"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "closed"
+								}
+							]
+						}
 					},
 					"response": []
 				}
@@ -189,29 +211,34 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "http://localhost:8090/petition-committee/auth/login?emailId=admin@petition.parliament.sr&password=2025@shangrila",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8090",
-							"path": [
-								"petition-committee",
-								"auth",
-								"login"
-							],
-							"query": [
-								{
-									"key": "emailId",
-									"value": "admin@petition.parliament.sr"
-								},
-								{
-									"key": "password",
-									"value": "2025@shangrila"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"emailId\": \"admin@petition.parliament.sr\",\n    \"password\":\"2025@shangrila\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
-						}
+							}
+						},
+						"url": "http://localhost:8090/petition-committee/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Petition Committe Response",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"status\": \"Closed\",\n    \"response\": \"Hi\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/slpp/petition/{{petitionId}}/update"
 					},
 					"response": []
 				}
