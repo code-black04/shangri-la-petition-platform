@@ -18,23 +18,23 @@ public class PetitionEntity {
     @Column(name = "status")
     private String petitionStatusEnum;
 
-    @Column(name = "petition_date")
+    @Column(name = "petition_date", updatable = false)
     @CreatedDate
     private LocalDate petitionDate;
 
-    @Column(name = "petition_title")
+    @Column(name = "petition_title", updatable = false)
     private String petitionTitle;
 
-    @Column(name = "petition_text")
+    @Column(name = "petition_text", updatable = false)
     private String petitionText;
 
-    @Column(name = "petitioner")
+    @Column(name = "petitioner", updatable = false)
     private String petitioner;
 
     @Column(name = "signature")
     private Integer signature;
 
-    @Column(name = "response")
+    @Column(name = "response", updatable = false)
     private String response;
 
     public Integer getPetitionerId() {

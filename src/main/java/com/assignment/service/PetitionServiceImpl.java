@@ -3,6 +3,7 @@ package com.assignment.service;
 import com.assignment.dto.PetitionDto;
 import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.entity.PetitionEntity;
+import com.assignment.exception.BadRequestException;
 import com.assignment.exception.PetitionNotFoundException;
 import com.assignment.mapper.PetitionDtoEntityMapper;
 import com.assignment.repository.PetitionRepository;
@@ -29,6 +30,9 @@ public class PetitionServiceImpl implements PetitionService{
 
     @Override
     public PetitionDto createPetition(PetitionDto petitionDto) {
+        if (petitionDto.getPetitionId() != null && !petitionRepository.findById(petitionDto.getPetitionId()).isEmpty()) {
+            throw new BadRequestException("Petition with petitionId " + petitionDto.getPetitionId() + " cannot be updated");
+        }
         PetitionEntity petitionEntity = petitionDtoEntityMapper.convertToPetitionEntity(petitionDto);
         petitionRepository.save(petitionEntity);
         log.info("Petition with petition id {} created successfully", petitionDto.getPetitionId());

@@ -66,7 +66,7 @@ public class PetitionController {
             throw new PetitionNotFoundException("No petition exists");
         }
         log.info("All Petitions provided");
-        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(petitionDtoList, HttpStatus.FOUND);
+        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(petitionDtoList, HttpStatus.OK);
         return responseEntity;
     }
 
@@ -79,7 +79,7 @@ public class PetitionController {
             throw new PetitionNotFoundException("No petition exist with " + status + " status");
         }
 
-        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(allPetitionByStatus, HttpStatus.FOUND);
+        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(allPetitionByStatus, HttpStatus.OK);
         return responseEntity;
     }
 

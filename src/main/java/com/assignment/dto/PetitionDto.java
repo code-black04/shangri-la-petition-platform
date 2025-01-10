@@ -13,7 +13,7 @@ public class PetitionDto {
     @JsonProperty(value = "status")
     private PetitionStatusEnum petitionStatusEnum;
 
-    @JsonProperty(value = "petition_date")
+    @JsonProperty(value = "petition_date", required = true)
     private LocalDate petitionDate;
 
     @NotNull
@@ -26,9 +26,7 @@ public class PetitionDto {
     @JsonProperty(value = "petition_text", required = true)
     private String petitionText;
 
-    @NotNull
-    @NotEmpty
-    @JsonProperty(value = "petitioner", required = true)
+    @JsonProperty(value = "petitioner")
     private String petitioner;
 
     @JsonProperty(value = "signature")
