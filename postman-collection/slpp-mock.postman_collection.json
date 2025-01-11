@@ -122,7 +122,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"petition_id\":\"1\",\n    \"status\": \"open\",\n    \"petition_title\": \"Increase Funding for Primary Care in SLHS in the 2025 Budget\",\n    \"petition_text\": \"The Shangri-La government should consider increasing the funds allocated to primary care in the 2025 budget for the Shangri-La Health Service (SLHS)...\",\n    \"petitioner\": \"johnsmith@gmail.com\",\n    \"signatures\": \"999\",\n    \"response\": \"Parliamentary debates Note: the government will consider the proposal if...\"\n}",
+							"raw": "{\n    \"status\": \"Open\",\n    \"petition_title\": \"Increase Funding for Primary Care in SLHS in the 2025 Budget\",\n    \"petition_text\": \"The Shangri-La government should consider increasing the funds allocated to primary care in the 2025 budget for the Shangri-La Health Service (SLHS)...\",\n    \"petitioner\": \"pm455@gmail.com\",\n    \"signature\": 1,\n    \"response\":\"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -172,7 +172,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/slpp/petitions/signature?petitionId=1&emailId=pm455@gmail.com",
+							"raw": "{{url}}/slpp/petitions/signature?petitionId=2&emailId=pm455@gmail.com",
 							"host": [
 								"{{url}}"
 							],
@@ -184,7 +184,7 @@
 							"query": [
 								{
 									"key": "petitionId",
-									"value": "1"
+									"value": "2"
 								},
 								{
 									"key": "emailId",
@@ -274,8 +274,25 @@
 				{
 					"name": "Update Threshold Value",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/slpp/petition/threshold?threshold=2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"slpp",
+								"petition",
+								"threshold"
+							],
+							"query": [
+								{
+									"key": "threshold",
+									"value": "2"
+								}
+							]
+						}
 					},
 					"response": []
 				}

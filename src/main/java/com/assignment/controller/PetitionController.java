@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/slpp/petitions")
+@RequestMapping(path = "/slpp")
 public class PetitionController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionController.class);
@@ -35,7 +35,7 @@ public class PetitionController {
      * @param petitionDto
      * @return
      */
-    @RequestMapping(path = "/create",
+    @RequestMapping(path = "/petitions/create",
             method = RequestMethod.POST,
             consumes = { "application/json" },
             produces = { "application/json" })
@@ -68,7 +68,7 @@ public class PetitionController {
         return response;
     }
 
-    @RequestMapping(path = "",
+    @RequestMapping(path = "/petitions",
             method = RequestMethod.GET,
             produces = { "application/json" })
     public ResponseEntity<List<PetitionDto>> getAllPetitions() throws PetitionNotFoundException {
@@ -83,7 +83,7 @@ public class PetitionController {
         return responseEntity;
     }
 
-    @RequestMapping(path = "/petitions", method = RequestMethod.GET,
+    @RequestMapping(path = "/petition", method = RequestMethod.GET,
                     produces = {"application/json"})
     public ResponseEntity<List<PetitionDto>> getAllPetitionsByStatus(@RequestParam String status) throws PetitionNotFoundException {
         List<PetitionDto> allPetitionByStatus = petitionService.getAllPetitionsByStatus(status);
@@ -98,7 +98,7 @@ public class PetitionController {
 
     @RequestMapping(path = "/petitions/signature",
                     method = RequestMethod.PUT,
-                    produces = {"application/json"})
+                    produces = "application/json")
     public ResponseEntity<MessageDto> signOpenPetition(
             @RequestParam Integer petitionId,
             @RequestParam String emailId
