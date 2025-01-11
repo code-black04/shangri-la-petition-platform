@@ -42,13 +42,13 @@ public class PetitionController {
     public ResponseEntity<PetitionDto> createPetition(
             @RequestBody @Valid PetitionDto petitionDto
     ) {
-        if (!petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
+        if (petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
             throw new BadRequestException("The petition cannot be closed upon creation. Please set the status to 'Open'.");
         }
         if (petitionDto.getSignature() != 1) {
             throw new BadRequestException("The number of signatures must be exactly 1, indicating your support for the petition.");
         }
-        if (petitionDto.getResponse() != null) {
+        if (petitionDto.getResponse() != null && !petitionDto.getResponse().isEmpty()) {
             throw  new BadRequestException("Only the petition committee can publish a response. Please leave the response field empty.");
         }
         petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);

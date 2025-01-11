@@ -37,6 +37,9 @@ public class PetitionEntity {
     @Column(name = "response")
     private String response;
 
+    @Column(name = "signature_threshold")
+    private Integer signatureThreshold;
+
     public Integer getPetitionerId() {
         return petitionerId;
     }
@@ -99,5 +102,13 @@ public class PetitionEntity {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public Integer getSignatureThreshold() {
+        return signatureThreshold;
+    }
+
+    public void setSignatureThreshold(Integer signatureThreshold) {
+        this.signatureThreshold = signatureThreshold;
     }
 }
