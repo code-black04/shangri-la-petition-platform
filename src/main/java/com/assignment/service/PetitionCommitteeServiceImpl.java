@@ -38,6 +38,10 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
             throw new BadRequestException("Closed Petition cannot be updated further.");
         }
 
+        if (existingPetition.getSignature() < existingPetition.getSignatureThreshold()) {
+            throw new BadRequestException("Require at least " + existingPetition.getSignatureThreshold() + " signature to close the petition");
+        }
+        
         existingPetition.setPetitionStatusEnum(String.valueOf(petitionCommitteeDecision.getPetitionStatusEnum()));
         existingPetition.setResponse(petitionCommitteeDecision.getResponse());
 
