@@ -75,4 +75,13 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
         petitionRepository.saveAll(openPetitions); // Save the updated petitions
         return true;
     }
+
+    @Override
+    public Integer getCurrentThreshold() {
+        Integer currentThreshold = petitionThresholdRepository.existsById(1) ?
+                petitionThresholdRepository.getById(1).getThresholdValue() : null;
+        return currentThreshold;
+    }
+
+
 }

@@ -80,5 +80,17 @@ public class PetitionCommitteeController {
         return response;
     }
 
+    @RequestMapping(path = "/petition/threshold", method = RequestMethod.GET, produces = { "application/json" })
+    public ResponseEntity<MessageDto> getCurrentThreshold() {
+        Integer currentThreshold = petitionCommitteeService.getCurrentThreshold();
+        if (currentThreshold == null) {
+            throw new BadRequestException("No signature threshold set yet");
+        }
+        MessageDto message = new MessageDto(HttpStatus.OK, "Received current hhreshold");
+        ResponseEntity<MessageDto> response = new ResponseEntity<>(message, HttpStatus.OK);
+        log.info("Response: {}", response);
+        return response;
+    }
+
 
 }
