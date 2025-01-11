@@ -11,12 +11,19 @@ import com.assignment.mapper.PetitionerDtoEntityMapper;
 import com.assignment.repository.PetitionerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PetitionerSigningServiceImpl implements PetitionerSigningService {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionerSigningServiceImpl.class);
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     private final PetitionerDtoEntityMapper petitionerDtoEntityMapper;
 
@@ -36,10 +43,13 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
         }
 
         PetitionerEntity petitionerEntity = petitionerDtoEntityMapper.convertToPetitionerEntity(petitionerDto);
+        petitionerEntity.setPassword(encoder.encode(petitionerDto.getPassword()));
         petitionerRepository.save(petitionerEntity);
         log.info("User {} successfully signed up", petitionerDto.getEmailId());
         return petitionerDtoEntityMapper.convertToPetitionerDto(petitionerEntity);
     }
+
+
 
     @Override
     public Boolean signInPetitioner(SigningInRequest signingInRequest) throws UserNotFoundException, IncorrectPasswordException, UnauthorizedAccessException {

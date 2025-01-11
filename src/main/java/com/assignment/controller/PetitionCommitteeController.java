@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping(path = "/slpp")
+@RequestMapping(path = "/api/slpp")
 public class PetitionCommitteeController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionCommitteeController.class);

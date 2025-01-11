@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/slpp")
+@RequestMapping(path = "/api/slpp")
 public class PetitionController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionController.class);
@@ -42,7 +42,7 @@ public class PetitionController {
     public ResponseEntity<PetitionDto> createPetition(
             @RequestBody @Valid PetitionDto petitionDto
     ) {
-        if (petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
+        if (petitionDto.getPetitionStatusEnum()!= null && petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
             throw new BadRequestException("The petition cannot be closed upon creation. Please set the status to 'Open'.");
         }
         if (petitionDto.getSignature() != 1) {
