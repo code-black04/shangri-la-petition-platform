@@ -9,4 +9,5 @@ public interface PetitionCommitteeService {
 
     PetitionDto updatePetitionWithStatusAndResponse (Integer petitionId, PetitionCommitteeDecision petitionCommitteeDecision) throws DuplicateAccountException;
 
+    Boolean updateSignatureThresholdForPetitions(Integer signatureThreshold);
 }
