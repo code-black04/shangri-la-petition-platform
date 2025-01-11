@@ -14,12 +14,6 @@ import java.util.UUID;
 @Entity(name = "petitioner_entity")
 public class PetitionerEntity {
 
-    @Id
-    @Column(name = "petitioner_id", columnDefinition = "VARCHAR(255)", updatable = false, unique = true)
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID petitionerId;
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -29,7 +23,8 @@ public class PetitionerEntity {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "email_id")
+    @Id
+    @Column(name = "email_id", updatable = false, unique = true)
     private String emailId;
 
     @Column(name = "password")
@@ -37,14 +32,6 @@ public class PetitionerEntity {
 
     @Column(name = "biometric_id")
     private String biometricId;
-
-    public UUID getPetitionerId() {
-        return petitionerId;
-    }
-
-    public void setPetitionerId(UUID petitionerId) {
-        this.petitionerId = petitionerId;
-    }
 
     public String getFirstName() {
         return firstName;

@@ -11,9 +11,6 @@ import java.util.UUID;
 
 public class PetitionerDto {
 
-    @JsonIgnore
-    private UUID petitionerId;
-
     @NotNull
     @NotEmpty
     @JsonProperty(value = "firstName", required = true)
@@ -43,14 +40,6 @@ public class PetitionerDto {
     @NotEmpty
     @JsonProperty(value = "biometricId", required = true)
     private String biometricId;
-
-    public UUID getPetitionerId() {
-        return petitionerId;
-    }
-
-    public void setPetitionerId(UUID petitionerId) {
-        this.petitionerId = petitionerId;
-    }
 
     public String getFirstName() {
         return firstName;
@@ -103,19 +92,18 @@ public class PetitionerDto {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof PetitionerDto that)) return false;
-        return Objects.equals(petitionerId, that.petitionerId) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(dateOfBirth, that.dateOfBirth) && Objects.equals(emailId, that.emailId) && Objects.equals(password, that.password) && Objects.equals(biometricId, that.biometricId);
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(dateOfBirth, that.dateOfBirth) && Objects.equals(emailId, that.emailId) && Objects.equals(password, that.password) && Objects.equals(biometricId, that.biometricId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(petitionerId, firstName, lastName, dateOfBirth, emailId, password, biometricId);
+        return Objects.hash(firstName, lastName, dateOfBirth, emailId, password, biometricId);
     }
 
     @Override
     public String toString() {
         return "PetitionerDto{" +
-                "petitionerId=" + petitionerId +
-                ", firstName='" + firstName + '\'' +
+                "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", emailId='" + emailId + '\'' +

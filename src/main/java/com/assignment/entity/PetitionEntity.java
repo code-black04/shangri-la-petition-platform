@@ -4,16 +4,18 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table
 @Entity(name = "petition_entity")
 public class PetitionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "petitioner_seq")
-    @SequenceGenerator(name = "petitioner_seq", sequenceName = "petitioner_sequence", allocationSize = 1)
-    @Column(name = "petitioner_id", updatable = false, unique = true)
-    private Integer petitionerId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "petition_seq")
+    @SequenceGenerator(name = "petition_seq", sequenceName = "petition_sequence", allocationSize = 1)
+    @Column(name = "petition_id", updatable = false, unique = true)
+    private Integer petitionId;
 
     @Column(name = "status")
     private String petitionStatusEnum;
@@ -40,12 +42,16 @@ public class PetitionEntity {
     @Column(name = "signature_threshold")
     private Integer signatureThreshold;
 
-    public Integer getPetitionerId() {
-        return petitionerId;
+    @ElementCollection
+    @CollectionTable(name = "petition_signing_users", joinColumns = @JoinColumn(name = "petition_id"))
+    private List<PetitionSigningUserEntity> petitionSigningUserEntityList = new ArrayList<>();
+
+    public Integer getPetitionId() {
+        return petitionId;
     }
 
-    public void setPetitionerId(Integer petitionerId) {
-        this.petitionerId = petitionerId;
+    public void setPetitionId(Integer petitionerId) {
+        this.petitionId = petitionerId;
     }
 
     public String getPetitionStatusEnum() {
@@ -110,5 +116,13 @@ public class PetitionEntity {
 
     public void setSignatureThreshold(Integer signatureThreshold) {
         this.signatureThreshold = signatureThreshold;
+    }
+
+    public List<PetitionSigningUserEntity> getPetitionSigningUserEntityList() {
+        return petitionSigningUserEntityList;
+    }
+
+    public void setPetitionSigningUserEntityList(List<PetitionSigningUserEntity> petitionSigningUserEntityList) {
+        this.petitionSigningUserEntityList = petitionSigningUserEntityList;
     }
 }
