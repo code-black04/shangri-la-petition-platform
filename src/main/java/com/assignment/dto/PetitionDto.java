@@ -38,6 +38,9 @@ public class PetitionDto {
     @JsonProperty(value = "response")
     private String response;
 
+    @JsonProperty(value = "signature_threshold")
+    private Integer signatureThreshold;
+
     @JsonProperty("petitionSigningUserEntityList")
     private List<PetitionSigningUserDto> petitionSigningUserEntityList = new ArrayList<>();
 
@@ -105,6 +108,14 @@ public class PetitionDto {
         this.response = response;
     }
 
+    public Integer getSignatureThreshold() {
+        return signatureThreshold;
+    }
+
+    public void setSignatureThreshold(Integer signatureThreshold) {
+        this.signatureThreshold = signatureThreshold;
+    }
+
     public List<PetitionSigningUserDto> getPetitionSigningUserEntityList() {
         return petitionSigningUserEntityList;
     }
@@ -116,12 +127,12 @@ public class PetitionDto {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof PetitionDto that)) return false;
-        return Objects.equals(petitionId, that.petitionId) && petitionStatusEnum == that.petitionStatusEnum && Objects.equals(petitionDate, that.petitionDate) && Objects.equals(petitionTitle, that.petitionTitle) && Objects.equals(petitionText, that.petitionText) && Objects.equals(petitioner, that.petitioner) && Objects.equals(signature, that.signature) && Objects.equals(response, that.response) && Objects.equals(petitionSigningUserEntityList, that.petitionSigningUserEntityList);
+        return Objects.equals(petitionId, that.petitionId) && petitionStatusEnum == that.petitionStatusEnum && Objects.equals(petitionDate, that.petitionDate) && Objects.equals(petitionTitle, that.petitionTitle) && Objects.equals(petitionText, that.petitionText) && Objects.equals(petitioner, that.petitioner) && Objects.equals(signature, that.signature) && Objects.equals(response, that.response) && Objects.equals(signatureThreshold, that.signatureThreshold) && Objects.equals(petitionSigningUserEntityList, that.petitionSigningUserEntityList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(petitionId, petitionStatusEnum, petitionDate, petitionTitle, petitionText, petitioner, signature, response, petitionSigningUserEntityList);
+        return Objects.hash(petitionId, petitionStatusEnum, petitionDate, petitionTitle, petitionText, petitioner, signature, response, signatureThreshold, petitionSigningUserEntityList);
     }
 
     @Override
@@ -135,6 +146,7 @@ public class PetitionDto {
                 ", petitioner='" + petitioner + '\'' +
                 ", signature=" + signature +
                 ", response='" + response + '\'' +
+                ", signatureThreshold=" + signatureThreshold +
                 ", petitionSigningUserEntityList=" + petitionSigningUserEntityList +
                 '}';
     }
