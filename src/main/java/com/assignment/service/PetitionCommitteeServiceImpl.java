@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
 
@@ -44,5 +46,21 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
         PetitionDto petitionDto = petitionDtoEntityMapper.convertToPetitionDto(existingPetition);
         return petitionDto;
 
+    }
+
+    @Override
+    public Boolean updateSignatureThresholdForPetitions(Integer signatureThreshold) {
+        List<PetitionEntity> openPetitions = petitionRepository.findAllPetitionByPetitionStatusEnum(String.valueOf(PetitionStatusEnum.OPEN));
+
+        if (openPetitions.isEmpty()) {
+            return false; // No petitions to update
+        }
+
+        for (PetitionEntity petition : openPetitions) {
+            petition.setSignatureThreshold(signatureThreshold); // Update the threshold
+        }
+
+        petitionRepository.saveAll(openPetitions); // Save the updated petitions
+        return true;
     }
 }

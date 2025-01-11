@@ -1,9 +1,11 @@
 package com.assignment.controller;
 
+import com.assignment.dto.MessageDto;
 import com.assignment.dto.PetitionCommitteeDecision;
 import com.assignment.dto.PetitionDto;
 import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.exception.BadRequestException;
+import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.service.PetitionCommitteeService;
 import com.assignment.service.PetitionService;
 import org.slf4j.Logger;
@@ -55,4 +57,23 @@ public class PetitionCommitteeController {
         }
         return response;
     }
+
+    @RequestMapping(path = "/petition/threshold",
+                    method = RequestMethod.PUT,
+                    produces = { "application/json" })
+    public ResponseEntity<MessageDto> updateSignatureThresholdForPetitions(
+            @RequestParam Integer threshold
+    ) {
+        Boolean updatedThreshold = petitionCommitteeService.updateSignatureThresholdForPetitions(threshold);
+        if (!updatedThreshold) {
+            log.error("Un-successful signature threshold attempt");
+            throw new BadRequestException("Un-successful signature threshold attempt");
+        }
+        MessageDto message = new MessageDto(HttpStatus.OK, "Successful signature threshold attempt");
+        ResponseEntity<MessageDto> response = new ResponseEntity<>(message, HttpStatus.OK);
+        log.info("Response: {}", response);
+        return response;
+    }
+
+
 }
