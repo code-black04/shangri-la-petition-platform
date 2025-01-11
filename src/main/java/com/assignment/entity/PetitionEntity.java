@@ -1,5 +1,6 @@
 package com.assignment.entity;
 
+import com.assignment.dto.PetitionStatusEnum;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -18,7 +19,8 @@ public class PetitionEntity {
     private Integer petitionId;
 
     @Column(name = "status")
-    private String petitionStatusEnum;
+    @Convert(converter = PetitionStatusEnumConverter.class)
+    private PetitionStatusEnum petitionStatusEnum;
 
     @Column(name = "petition_date", updatable = false)
     @CreatedDate
@@ -42,8 +44,8 @@ public class PetitionEntity {
     @Column(name = "signature_threshold")
     private Integer signatureThreshold;
 
-    @ElementCollection
-    @CollectionTable(name = "petition_signing_users", joinColumns = @JoinColumn(name = "petition_id"))
+    @OneToMany(mappedBy = "petition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    @CollectionTable(name = "petition_signing_users", joinColumns = @JoinColumn(name = "petition_id"))
     private List<PetitionSigningUserEntity> petitionSigningUserEntityList = new ArrayList<>();
 
     public Integer getPetitionId() {
@@ -54,11 +56,11 @@ public class PetitionEntity {
         this.petitionId = petitionerId;
     }
 
-    public String getPetitionStatusEnum() {
+    public PetitionStatusEnum getPetitionStatusEnum() {
         return petitionStatusEnum;
     }
 
-    public void setPetitionStatusEnum(String petitionStatusEnum) {
+    public void setPetitionStatusEnum(PetitionStatusEnum petitionStatusEnum) {
         this.petitionStatusEnum = petitionStatusEnum;
     }
 

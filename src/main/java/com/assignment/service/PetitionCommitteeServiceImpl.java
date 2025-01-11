@@ -42,7 +42,7 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
             throw new BadRequestException("Require at least " + existingPetition.getSignatureThreshold() + " signature to close the petition");
         }
         
-        existingPetition.setPetitionStatusEnum(String.valueOf(petitionCommitteeDecision.getPetitionStatusEnum()));
+        existingPetition.setPetitionStatusEnum(petitionCommitteeDecision.getPetitionStatusEnum());
         existingPetition.setResponse(petitionCommitteeDecision.getResponse());
 
         petitionRepository.save(existingPetition);

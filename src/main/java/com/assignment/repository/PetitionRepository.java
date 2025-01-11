@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface PetitionRepository extends JpaRepository<PetitionEntity, Integer> {
 
+    PetitionEntity findByPetitionId(Integer petitionId);
+
     List<PetitionEntity> findAllPetitionByPetitionStatusEnum(String status);
 }

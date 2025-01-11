@@ -3,10 +3,14 @@ package com.assignment.service;
 import com.assignment.dto.PetitionDto;
 import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.entity.PetitionEntity;
+import com.assignment.entity.PetitionSigningUserEntity;
+import com.assignment.entity.PetitionSigningUserId;
 import com.assignment.exception.BadRequestException;
 import com.assignment.exception.PetitionNotFoundException;
+import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.mapper.PetitionDtoEntityMapper;
 import com.assignment.repository.PetitionRepository;
+import com.assignment.repository.PetitionerRepository;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,20 +27,29 @@ public class PetitionServiceImpl implements PetitionService{
 
     private final PetitionRepository petitionRepository;
 
-    public PetitionServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository) {
+    private final PetitionerRepository petitionerRepository;
+
+    public PetitionServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository, PetitionerRepository petitionerRepository) {
         this.petitionDtoEntityMapper = petitionDtoEntityMapper;
         this.petitionRepository = petitionRepository;
+        this.petitionerRepository = petitionerRepository;
     }
 
     @Override
     public PetitionDto createPetition(PetitionDto petitionDto) {
-        if (petitionDto.getPetitionId() != null && !petitionRepository.findById(petitionDto.getPetitionId()).isEmpty()) {
-            throw new BadRequestException("Petition with petitionId " + petitionDto.getPetitionId() + " cannot be updated");
+        boolean isPetitioner = isPetitionerExists(petitionDto.getPetitioner());
+        if (isPetitioner) {
+            if (petitionDto.getPetitionId() != null && !petitionRepository.findById(petitionDto.getPetitionId()).isEmpty()) {
+                throw new BadRequestException("Petition with petitionId " + petitionDto.getPetitionId() + " cannot be updated");
+            }
+            PetitionEntity petitionEntity = petitionDtoEntityMapper.convertToPetitionEntity(petitionDto);
+            petitionRepository.save(petitionEntity);
+            log.info("Petition with petition id {} created successfully", petitionDto.getPetitionId());
+            return petitionDtoEntityMapper.convertToPetitionDto(petitionEntity);
+        } else {
+            log.error("Petitioner does not exists with email Id provided");
+            throw new UnauthorizedAccessException("Petitioner does not exists with email Id provided");
         }
-        PetitionEntity petitionEntity = petitionDtoEntityMapper.convertToPetitionEntity(petitionDto);
-        petitionRepository.save(petitionEntity);
-        log.info("Petition with petition id {} created successfully", petitionDto.getPetitionId());
-        return petitionDtoEntityMapper.convertToPetitionDto(petitionEntity);
     }
 
     @Override
@@ -64,5 +77,52 @@ public class PetitionServiceImpl implements PetitionService{
         return petitionEntities.stream()
                 .map(petitionDtoEntityMapper::convertToPetitionDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean signOpenPetition(Integer petitionId, String emailId) {
+        PetitionEntity existingPetition = petitionRepository.findByPetitionId(petitionId);
+
+        if (existingPetition == null) {
+            log.error("Petition does not exists");
+            throw new PetitionNotFoundException("Petition does not exists");
+        } else {
+            if (existingPetition.getPetitionStatusEnum().equals(PetitionStatusEnum.OPEN)) {
+
+                boolean isPetitioner = isPetitionerExists(emailId);
+                if (isPetitioner) {
+                    boolean isPetitionAlreadySigned = existingPetition.getPetitionSigningUserEntityList().stream()
+                            .anyMatch(user -> user.getId().getEmailId().equals(emailId));
+
+                    if (isPetitionAlreadySigned) {
+                        log.warn("Email ID {} has already signed the petition.", emailId);
+                        throw new BadRequestException("You have already signed this petition.");
+                    }
+
+                    // Add new signing user to the list
+                    PetitionSigningUserEntity newSigningUser = new PetitionSigningUserEntity();
+                    newSigningUser.setId(new PetitionSigningUserId(petitionId, emailId));
+                    existingPetition.getPetitionSigningUserEntityList().add(newSigningUser);
+                    petitionRepository.save(existingPetition);
+
+                    log.info("Email ID {} successfully signed the petition with ID {}.", emailId, petitionId);
+                    return true;
+                } else {
+                    log.error("Petitioner does not exists with email Id provided");
+                    throw new UnauthorizedAccessException("Petitioner does not exists with email Id provided");
+                }
+            } else {
+                log.error("Signing attempt for closed petition declined.");
+                throw new BadRequestException("Signing attempt for closed petition declined.");
+            }
+        }
+    }
+
+    private boolean isPetitionerExists(String emailId) {
+        boolean isPetitioner = false;
+        if (petitionerRepository.findPetitionerByEmailId(emailId) != null) {
+            isPetitioner = true;
+        }
+        return isPetitioner;
     }
 }

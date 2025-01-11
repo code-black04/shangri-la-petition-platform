@@ -14,4 +14,5 @@ public interface PetitionService {
 
     List<PetitionDto> getAllPetitionsByStatus(String petitionStatus) throws PetitionNotFoundException;
 
+    Boolean signOpenPetition(Integer petitionId, String emailId);
 }

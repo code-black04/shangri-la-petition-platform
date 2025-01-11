@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/slpp")
+@RequestMapping(path = "/slpp/petitions")
 public class PetitionController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionController.class);
@@ -35,7 +35,7 @@ public class PetitionController {
      * @param petitionDto
      * @return
      */
-    @RequestMapping(path = "/petitions/create",
+    @RequestMapping(path = "/create",
             method = RequestMethod.POST,
             consumes = { "application/json" },
             produces = { "application/json" })
@@ -68,7 +68,7 @@ public class PetitionController {
         return response;
     }
 
-    @RequestMapping(path = "/petitions",
+    @RequestMapping(path = "",
             method = RequestMethod.GET,
             produces = { "application/json" })
     public ResponseEntity<List<PetitionDto>> getAllPetitions() throws PetitionNotFoundException {
@@ -83,7 +83,7 @@ public class PetitionController {
         return responseEntity;
     }
 
-    @RequestMapping(path = "/petition", method = RequestMethod.GET,
+    @RequestMapping(path = "/petitions", method = RequestMethod.GET,
                     produces = {"application/json"})
     public ResponseEntity<List<PetitionDto>> getAllPetitionsByStatus(@RequestParam String status) throws PetitionNotFoundException {
         List<PetitionDto> allPetitionByStatus = petitionService.getAllPetitionsByStatus(status);
@@ -94,6 +94,24 @@ public class PetitionController {
 
         ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(allPetitionByStatus, HttpStatus.OK);
         return responseEntity;
+    }
+
+    @RequestMapping(path = "/petitions/signature",
+                    method = RequestMethod.PUT,
+                    produces = {"application/json"})
+    public ResponseEntity<MessageDto> signOpenPetition(
+            @RequestParam Integer petitionId,
+            @RequestParam String emailId
+    ) {
+        boolean signedSuccessfully = petitionService.signOpenPetition(petitionId, emailId);
+        if (!signedSuccessfully) {
+            log.error("Un-successful signature  attempt");
+            throw new BadRequestException("Un-successful signature attempt");
+        }
+        MessageDto message = new MessageDto(HttpStatus.OK, "Successful signature attempt");
+        ResponseEntity<MessageDto> response = new ResponseEntity<>(message, HttpStatus.OK);
+        log.info("Response: {}", response);
+        return response;
     }
 
 }

@@ -24,6 +24,8 @@ public enum PetitionStatusEnum {
         throw new IllegalArgumentException("Invalid value for PetitionStatusEnum: " + value);
     }
 
+
+
     @JsonValue
     public String toValue() {
         return value;
