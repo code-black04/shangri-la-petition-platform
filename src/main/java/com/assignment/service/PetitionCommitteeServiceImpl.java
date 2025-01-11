@@ -54,7 +54,7 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
 
     @Override
     public Boolean updateSignatureThresholdForPetitions(Integer signatureThreshold) {
-        List<PetitionEntity> openPetitions = petitionRepository.findAllPetitionByPetitionStatusEnum(String.valueOf(PetitionStatusEnum.OPEN));
+        List<PetitionEntity> openPetitions = petitionRepository.findAllByPetitionStatusEnum(PetitionStatusEnum.OPEN);
 
         if (openPetitions.isEmpty()) {
             return false; // No petitions to update

@@ -13,7 +13,7 @@ public class PetitionStatusEnumConverter implements AttributeConverter<PetitionS
         if (attribute == null) {
             return null;
         }
-        return attribute.toValue();
+        return attribute.toValue().toUpperCase();
     }
 
     @Override

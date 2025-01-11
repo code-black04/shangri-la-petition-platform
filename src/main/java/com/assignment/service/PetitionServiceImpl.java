@@ -67,8 +67,7 @@ public class PetitionServiceImpl implements PetitionService{
     @Override
     public List<PetitionDto> getAllPetitionsByStatus(String petitionStatus) throws PetitionNotFoundException {
         PetitionStatusEnum statusEnum = PetitionStatusEnum.fromValue(petitionStatus);
-
-        List<PetitionEntity> petitionEntities = petitionRepository.findAllPetitionByPetitionStatusEnum(String.valueOf(statusEnum));
+        List<PetitionEntity> petitionEntities = petitionRepository.findAllByPetitionStatusEnum(statusEnum);
 
         if (petitionEntities.isEmpty()) {
             log.error("No petition exist with {} status", petitionStatus);

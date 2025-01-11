@@ -1,5 +1,6 @@
 package com.assignment.repository;
 
+import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.entity.PetitionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,5 +12,5 @@ public interface PetitionRepository extends JpaRepository<PetitionEntity, Intege
 
     PetitionEntity findByPetitionId(Integer petitionId);
 
-    List<PetitionEntity> findAllPetitionByPetitionStatusEnum(String status);
+    List<PetitionEntity> findAllByPetitionStatusEnum(PetitionStatusEnum status);
 }
