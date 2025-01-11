@@ -148,18 +148,47 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/slpp/petition?status=closed",
+							"raw": "{{url}}/slpp/petitions?status=open",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"slpp",
-								"petition"
+								"petitions"
 							],
 							"query": [
 								{
 									"key": "status",
-									"value": "closed"
+									"value": "open"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign petition",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/slpp/petitions/signature?petitionId=1&emailId=pm455@gmail.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"slpp",
+								"petitions",
+								"signature"
+							],
+							"query": [
+								{
+									"key": "petitionId",
+									"value": "1"
+								},
+								{
+									"key": "emailId",
+									"value": "pm455@gmail.com"
 								}
 							]
 						}
@@ -239,6 +268,14 @@
 							}
 						},
 						"url": "{{url}}/slpp/petition/{{petitionId}}/update"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Threshold Value",
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
