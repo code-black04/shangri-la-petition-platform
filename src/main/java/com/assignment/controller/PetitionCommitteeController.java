@@ -58,6 +58,11 @@ public class PetitionCommitteeController {
         return response;
     }
 
+    /**
+     * Update Threshold signature update
+     * @param threshold
+     * @return
+     */
     @RequestMapping(path = "/petition/threshold",
                     method = RequestMethod.PUT,
                     produces = { "application/json" })
