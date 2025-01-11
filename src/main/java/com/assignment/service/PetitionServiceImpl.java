@@ -5,11 +5,13 @@ import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.entity.PetitionEntity;
 import com.assignment.entity.PetitionSigningUserEntity;
 import com.assignment.entity.PetitionSigningUserId;
+import com.assignment.entity.PetitionThresholdEntity;
 import com.assignment.exception.BadRequestException;
 import com.assignment.exception.PetitionNotFoundException;
 import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.mapper.PetitionDtoEntityMapper;
 import com.assignment.repository.PetitionRepository;
+import com.assignment.repository.PetitionThresholdRepository;
 import com.assignment.repository.PetitionerRepository;
 import javassist.NotFoundException;
 import org.hibernate.Hibernate;
@@ -30,10 +32,13 @@ public class PetitionServiceImpl implements PetitionService{
 
     private final PetitionerRepository petitionerRepository;
 
-    public PetitionServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository, PetitionerRepository petitionerRepository) {
+    private final PetitionThresholdRepository petitionThresholdRepository;
+
+    public PetitionServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository, PetitionerRepository petitionerRepository, PetitionThresholdRepository petitionThresholdRepository) {
         this.petitionDtoEntityMapper = petitionDtoEntityMapper;
         this.petitionRepository = petitionRepository;
         this.petitionerRepository = petitionerRepository;
+        this.petitionThresholdRepository = petitionThresholdRepository;
     }
 
     @Override
@@ -44,6 +49,7 @@ public class PetitionServiceImpl implements PetitionService{
                 throw new BadRequestException("Petition with petitionId " + petitionDto.getPetitionId() + " cannot be updated");
             }
             PetitionEntity petitionEntity = petitionDtoEntityMapper.convertToPetitionEntity(petitionDto);
+            petitionEntity.setSignatureThreshold(petitionThresholdRepository.getById(1).getThresholdValue());
             petitionRepository.save(petitionEntity);
             log.info("Petition with petition id {} created successfully", petitionDto.getPetitionId());
             return petitionDtoEntityMapper.convertToPetitionDto(petitionEntity);

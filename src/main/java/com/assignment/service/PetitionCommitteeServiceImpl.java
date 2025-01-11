@@ -4,11 +4,13 @@ import com.assignment.dto.PetitionCommitteeDecision;
 import com.assignment.dto.PetitionDto;
 import com.assignment.dto.PetitionStatusEnum;
 import com.assignment.entity.PetitionEntity;
+import com.assignment.entity.PetitionThresholdEntity;
 import com.assignment.exception.BadRequestException;
 import com.assignment.exception.DuplicateAccountException;
 import com.assignment.exception.PetitionNotFoundException;
 import com.assignment.mapper.PetitionDtoEntityMapper;
 import com.assignment.repository.PetitionRepository;
+import com.assignment.repository.PetitionThresholdRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,9 +26,12 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
 
     private final PetitionRepository petitionRepository;
 
-    public PetitionCommitteeServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository) {
+    private final PetitionThresholdRepository petitionThresholdRepository;
+
+    public PetitionCommitteeServiceImpl(PetitionDtoEntityMapper petitionDtoEntityMapper, PetitionRepository petitionRepository, PetitionThresholdRepository petitionThresholdRepository) {
         this.petitionDtoEntityMapper = petitionDtoEntityMapper;
         this.petitionRepository = petitionRepository;
+        this.petitionThresholdRepository = petitionThresholdRepository;
     }
 
     @Override
@@ -55,6 +60,9 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
     @Override
     public Boolean updateSignatureThresholdForPetitions(Integer signatureThreshold) {
         List<PetitionEntity> openPetitions = petitionRepository.findAllByPetitionStatusEnum(PetitionStatusEnum.OPEN);
+
+        PetitionThresholdEntity petitionThresholdEntity = new PetitionThresholdEntity(1, signatureThreshold);
+        petitionThresholdRepository.save(petitionThresholdEntity);
 
         if (openPetitions.isEmpty()) {
             return false; // No petitions to update
