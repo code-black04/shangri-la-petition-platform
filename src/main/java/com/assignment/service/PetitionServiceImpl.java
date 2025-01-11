@@ -12,6 +12,7 @@ import com.assignment.mapper.PetitionDtoEntityMapper;
 import com.assignment.repository.PetitionRepository;
 import com.assignment.repository.PetitionerRepository;
 import javassist.NotFoundException;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,8 @@ public class PetitionServiceImpl implements PetitionService{
             log.error("No petition exists");
             throw new PetitionNotFoundException("No petition exists");
         }
+
+        petitionEntities.forEach(petition -> Hibernate.initialize(petition.getPetitionSigningUserEntityList()));
         return petitionEntities.stream()
                 .map(petitionDtoEntityMapper::convertToPetitionDto)
                 .collect(Collectors.toList());

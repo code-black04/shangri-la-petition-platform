@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class PetitionDto {
 
@@ -34,6 +37,9 @@ public class PetitionDto {
 
     @JsonProperty(value = "response")
     private String response;
+
+    @JsonProperty("petitionSigningUserEntityList")
+    private List<PetitionSigningUserDto> petitionSigningUserEntityList = new ArrayList<>();
 
     public Integer getPetitionId() {
         return petitionId;
@@ -99,6 +105,25 @@ public class PetitionDto {
         this.response = response;
     }
 
+    public List<PetitionSigningUserDto> getPetitionSigningUserEntityList() {
+        return petitionSigningUserEntityList;
+    }
+
+    public void setPetitionSigningUserEntityList(List<PetitionSigningUserDto> petitionSigningUserEntityList) {
+        this.petitionSigningUserEntityList = petitionSigningUserEntityList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PetitionDto that)) return false;
+        return Objects.equals(petitionId, that.petitionId) && petitionStatusEnum == that.petitionStatusEnum && Objects.equals(petitionDate, that.petitionDate) && Objects.equals(petitionTitle, that.petitionTitle) && Objects.equals(petitionText, that.petitionText) && Objects.equals(petitioner, that.petitioner) && Objects.equals(signature, that.signature) && Objects.equals(response, that.response) && Objects.equals(petitionSigningUserEntityList, that.petitionSigningUserEntityList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(petitionId, petitionStatusEnum, petitionDate, petitionTitle, petitionText, petitioner, signature, response, petitionSigningUserEntityList);
+    }
+
     @Override
     public String toString() {
         return "PetitionDto{" +
@@ -110,6 +135,7 @@ public class PetitionDto {
                 ", petitioner='" + petitioner + '\'' +
                 ", signature=" + signature +
                 ", response='" + response + '\'' +
+                ", petitionSigningUserEntityList=" + petitionSigningUserEntityList +
                 '}';
     }
 }
