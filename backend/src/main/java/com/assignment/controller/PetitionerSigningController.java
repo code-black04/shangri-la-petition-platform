@@ -69,15 +69,6 @@ public class PetitionerSigningController {
 
         String biometricId = petitionerDto.getBiometricId();
 
-        // Check if the BioID is already used
-        if (biometricIdManager.isBioIdUsed(biometricId)) {
-            log.error("BioID already used: {}", biometricId);
-            return new ResponseEntity<>(
-                    new MessageDto(HttpStatus.CONFLICT, "BioID already used: " + biometricId),
-                    HttpStatus.CONFLICT
-            );
-        }
-
         // Check if the BioID is valid and exists
         if (!biometricIdManager.isBioIdValid(biometricId)) {
             log.error("Biometric ID '{}' is invalid or not found", biometricId);
@@ -91,8 +82,6 @@ public class PetitionerSigningController {
         PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
 
         if (userDto != null) {
-            // Use the BioID (move it to the used set)
-            biometricIdManager.useBiometricId(biometricId);
             log.info("Signup successful for: {}", petitionerDto.getEmailId());
             return new ResponseEntity<>(
                     new MessageDto(HttpStatus.CREATED, "Signup successful for: " + petitionerDto.getEmailId()),

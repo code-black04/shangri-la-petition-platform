@@ -3,10 +3,7 @@ package com.assignment.service;
 import com.assignment.dto.SigningInRequest;
 import com.assignment.dto.PetitionerDto;
 import com.assignment.entity.PetitionerEntity;
-import com.assignment.exception.DuplicateAccountException;
-import com.assignment.exception.IncorrectPasswordException;
-import com.assignment.exception.UnauthorizedAccessException;
-import com.assignment.exception.UserNotFoundException;
+import com.assignment.exception.*;
 import com.assignment.mapper.PetitionerDtoEntityMapper;
 import com.assignment.repository.PetitionerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +58,11 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
         if (petitionerRepository.findPetitionerByEmailId(petitionerDto.getEmailId()) != null) {
             log.error("Account with {} already exists. ", petitionerDto.getEmailId());
             throw new DuplicateAccountException("Account with " + petitionerDto.getEmailId() + " already exists. Try again!");
+        }
+
+        if (petitionerRepository.findPetitionerByBiometricId(petitionerDto.getBiometricId()) != null) {
+            log.error("Account with {} already exists. ", petitionerDto.getBiometricId());
+            throw new DuplicateBiometricException("Account with " + petitionerDto.getBiometricId() + " already in use. Check back!");
         }
 
         PetitionerEntity petitionerEntity = petitionerDtoEntityMapper.convertToPetitionerEntity(petitionerDto);

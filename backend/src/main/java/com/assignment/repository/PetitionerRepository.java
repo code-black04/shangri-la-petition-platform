@@ -10,4 +10,6 @@ public interface PetitionerRepository extends JpaRepository<PetitionerEntity, UU
 
     PetitionerEntity findPetitionerByEmailId(String emailId);
 
+    PetitionerEntity findPetitionerByBiometricId(String biometricId);
+
 }
