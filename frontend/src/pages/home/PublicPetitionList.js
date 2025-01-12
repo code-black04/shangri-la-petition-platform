@@ -10,42 +10,64 @@ const PetitionListContainer = styled.div`
   padding: 20px;
   background-color: #121212;
   box-sizing: border-box;
+  max-width: 100%;
+  margin: 0 auto;
 `;
 
 const ListTitle = styled.h2`
   font-size: 32px;
   font-weight: bold;
   color: white;
-  margin-bottom: 40px; /* Add spacing between title and table */
+  margin-bottom: 40px;
   text-align: center;
+`;
+
+const ToggleButtonGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
+`;
+
+const ToggleButton = styled.button`
+  padding: 10px 20px;
+  background-color: ${(props) => (props.active ? "#007bff" : "#444")};
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#0056b3" : "#555")};
+  }
 `;
 
 const TableWrapper = styled.div`
-    width: 90%;
-  max-width: 1200px;
-  flex: 1; /* Let the table wrapper grow to fill available space */
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
+  max-height: 70vh; /* Set height relative to viewport for responsiveness */
+  overflow-y: auto; /* Add vertical scroll */
+  width: 100%;
   border: 1px solid #444;
-  border-radius: 10px;
-  background-color: #1e1e1e;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  padding: 10px;;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 `;
 
 const Table = styled.table`
-  width: 100%;
+  width: 100%; /* Make table take full width of its container */
   border-collapse: collapse;
+  table-layout: fixed; /* Distribute space evenly among columns */
 `;
 
-
 const TableHeader = styled.th`
-  padding: 15px;
+  position: sticky;
+  top: 0;
   background: #333;
+  z-index: 1;
+  padding: 15px;
   font-size: 16px;
   color: #fff;
-  text-align: center;
+  text-align: left;
   border-bottom: 2px solid #444;
 `;
 
@@ -53,6 +75,7 @@ const TableRow = styled.tr`
   &:nth-child(odd) {
     background: #2a2a2a;
   }
+
   &:nth-child(even) {
     background: #242424;
   }
@@ -66,6 +89,7 @@ const TableCell = styled.td`
   padding: 15px;
   font-size: 14px;
   color: #e0e0e0;
+  text-align: left;
   border-bottom: 1px solid #444;
 `;
 
@@ -96,7 +120,7 @@ const Modal = styled.div`
   z-index: 1000;
   max-width: 600px;
   width: 90%;
-  text-align: center;
+  text-align: left;
 `;
 
 const Overlay = styled.div`
@@ -139,7 +163,7 @@ const Label = styled.label`
   font-weight: bold;
   color: #e0e0e0;
   min-width: 100px;
-  text-align: center;
+  text-align: left;
 `;
 
 const Input = styled.input`
@@ -178,15 +202,18 @@ const ErrorMessage = styled.div`
   box-shadow: 0 2px 10px rgba(255, 77, 79, 0.3);
 `;
 
-const PetitionList = () => {
+const PublicPetitionList = () => {
   const [petitions, setPetitions] = useState([]);
   const [selectedPetition, setSelectedPetition] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("All");
   const [error, setError] = useState(null);
 
+  const status = ["All", "Open", "Closed"];
+
   useEffect(() => {
-    const fetchPetitions = async () => {
+    const fetchPetitions = async (status) => {
       try {
-        const response = await GetAllPetitionService.getAllPetitions("All");
+        const response = await GetAllPetitionService.getAllPetitions(status);
         if (!response.ok) {
           throw new Error("No Petition Found");
         }
@@ -198,21 +225,33 @@ const PetitionList = () => {
       }
     };
 
-    fetchPetitions();
-  }, []);
+    fetchPetitions(selectedStatus);
+  }, [selectedStatus]);
 
   const handleViewClick = (petition) => {
-    setSelectedPetition(petition); // Set the clicked petition as selected
+    console.log("Selected Petition: ", petition);
+    setSelectedPetition(petition);
   };
 
   const closeModal = () => {
-    setSelectedPetition(null); // Deselect the petition to close modal
+    setSelectedPetition(null);
   };
 
   return (
     <PetitionListContainer>
-      <ListTitle>All Petitions</ListTitle>
-      
+      <ListTitle>{selectedStatus} Petitions</ListTitle>
+      <ToggleButtonGroup>
+        {status.map((status) => (
+          <ToggleButton
+            key={status}
+            active={selectedStatus === status}
+            onClick={() => setSelectedStatus(status)}
+          >
+            {status}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+
       {error ? (
         <ErrorMessage>{error}</ErrorMessage>
       ) : (
@@ -223,9 +262,9 @@ const PetitionList = () => {
                 <TableHeader>Id</TableHeader>
                 <TableHeader>Date</TableHeader>
                 <TableHeader>Title</TableHeader>
-                <TableHeader>Signatures</TableHeader>
+                <TableHeader>Signatures Received</TableHeader>
                 <TableHeader>Status</TableHeader>
-                <TableHeader>Information</TableHeader>
+                <TableHeader>More Information</TableHeader>
               </tr>
             </thead>
             <tbody>
@@ -254,23 +293,23 @@ const PetitionList = () => {
             <FormContainer>
               <FormRow>
                 <Label>ID:</Label>
-                <Input type="text" value={selectedPetition.petition_id} readOnly />
+                <Input type="text" value={selectedPetition.petition_id || "N/A"} readOnly />
               </FormRow>
               <FormRow>
                 <Label>Title:</Label>
-                <Input type="text" value={selectedPetition.petition_title} readOnly />
+                <Input type="text" value={selectedPetition.petition_title || "N/A"} readOnly />
               </FormRow>
               <FormRow>
                 <Label>Content:</Label>
-                <TextArea value={selectedPetition.petition_text} readOnly />
+                <TextArea value={selectedPetition.petition_text || "N/A"} readOnly />
               </FormRow>
               <FormRow>
                 <Label>Petitioner:</Label>
-                <Input type="text" value={selectedPetition.petitioner} readOnly />
+                <Input type="text" value={selectedPetition.petitioner || "N/A"} readOnly />
               </FormRow>
               <FormRow>
                 <Label>Result:</Label>
-                <Input type="text" value={selectedPetition.response} readOnly />
+                <Input type="text" value={selectedPetition.response || "N/A"} readOnly />
               </FormRow>
             </FormContainer>
             <CloseButton onClick={closeModal}>Close</CloseButton>
@@ -281,4 +320,4 @@ const PetitionList = () => {
   );
 };
 
-export default PetitionList;
+export default PublicPetitionList;
