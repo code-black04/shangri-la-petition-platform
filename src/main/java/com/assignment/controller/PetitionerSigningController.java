@@ -41,22 +41,42 @@ public class PetitionerSigningController {
 
         String biometricId = petitionerDto.getBiometricId();
 
-        if (!biometricIdManager.useBiometricId(biometricId)) {
-            // Validate and remove the biometric ID
-            if (!biometricIdManager.useBiometricId(biometricId)) {
-                log.error("Invalid biometric ID: {}", biometricId);
-                return new ResponseEntity<>(new MessageDto(HttpStatus.BAD_REQUEST, "Invalid biometric ID"), HttpStatus.BAD_REQUEST);
-            }
+        // Check if the BioID is already used
+        if (biometricIdManager.isBioIdUsed(biometricId)) {
+            log.error("BioID already used: {}", biometricId);
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.CONFLICT, "BioID already used: " + biometricId),
+                    HttpStatus.CONFLICT
+            );
         }
 
-        PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
-        ResponseEntity<MessageDto> response = null;
-        if (userDto != null) {
-            MessageDto message = new MessageDto(HttpStatus.CREATED, "Petitioner " + petitionerDto.getEmailId() + " has signed up successfully");
-            response = new ResponseEntity<>(message, HttpStatus.CREATED);
-            log.info("Response: {}", response);
+        // Check if the BioID is valid and exists
+        if (!biometricIdManager.isBioIdValid(biometricId)) {
+            log.error("Biometric ID '{}' is invalid or not found", biometricId);
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.NOT_FOUND, "Biometric ID not found: " + biometricId),
+                    HttpStatus.NOT_FOUND
+            );
         }
-        return response;
+
+        // Use the BioID (move it to the used set)
+        biometricIdManager.useBiometricId(biometricId);
+
+        PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
+
+        if (userDto != null) {
+            log.info("Signup successful for: {}", petitionerDto.getEmailId());
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.CREATED, "Signup successful for: " + petitionerDto.getEmailId()),
+                    HttpStatus.CREATED
+            );
+        } else {
+            log.error("Unsuccessful signup attempt for: {}", petitionerDto.getEmailId());
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.BAD_REQUEST, "Unsuccessful signup attempt"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
     }
 
     @RequestMapping(path = "/login",
@@ -66,14 +86,27 @@ public class PetitionerSigningController {
             @RequestBody @Valid SigningInRequest signingInRequest
             ) {
         log.info("User with {} is trying to login", signingInRequest.getEmailId());
-        Boolean isSignInSuccessful =  petitionerSigningService.signInPetitioner(signingInRequest);
-        if (!isSignInSuccessful) {
-            log.error("Sign in was not successful");
-            throw new UnauthorizedAccessException("Unauthorized login attempt");
+
+        try {
+            Boolean isSignInSuccessful =  petitionerSigningService.signInPetitioner(signingInRequest);
+            if (Boolean.TRUE.equals(isSignInSuccessful)) {
+                MessageDto message = new MessageDto(
+                        HttpStatus.OK,
+                        "Successful login by " + signingInRequest.getEmailId()
+                );
+                log.info("Login successful for email '{}'", signingInRequest.getEmailId());
+                return ResponseEntity.ok(message);
+            } else {
+                log.error("Login failed for email '{}': Unauthorized attempt", signingInRequest.getEmailId());
+                throw new UnauthorizedAccessException("Invalid credentials provided");
+            }
+        } catch (Exception e) {
+            log.error("An error occurred during login for email '{}': {}", signingInRequest.getEmailId(), e.getMessage(), e);
+            MessageDto errorMessage = new MessageDto(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "An unexpected error occurred. Please try again later."
+            );
+            return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        MessageDto message = new MessageDto(HttpStatus.OK, "Successful login by " + signingInRequest.getEmailId());
-        ResponseEntity<MessageDto> response = new ResponseEntity<>(message, HttpStatus.OK);
-        log.info("Response: {}", response);
-        return response;
     }
 }

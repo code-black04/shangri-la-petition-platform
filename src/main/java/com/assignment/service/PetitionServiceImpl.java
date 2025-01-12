@@ -107,6 +107,8 @@ public class PetitionServiceImpl implements PetitionService{
                         throw new BadRequestException("You have already signed this petition.");
                     }
 
+                    existingPetition.setSignature(existingPetition.getSignature()+1);
+
                     // Add new signing user to the list
                     PetitionSigningUserEntity newSigningUser = new PetitionSigningUserEntity();
                     newSigningUser.setId(new PetitionSigningUserId(petitionId, emailId));
