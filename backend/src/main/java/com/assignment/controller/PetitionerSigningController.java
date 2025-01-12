@@ -138,6 +138,11 @@ public class PetitionerSigningController {
             if(user != null && !Boolean.TRUE.equals(user.isCommitteeAdmin())){
                 throw new UnauthorizedAccessException("Unauthorized login attempt, user not a committee member");
             }
+        } else {
+            PetitionerEntity user = userRepository.findPetitionerByEmailId(authRequestDTO.getUsername());
+            if(user != null && Boolean.TRUE.equals(user.isCommitteeAdmin())){
+                throw new UnauthorizedAccessException("Unauthorized login attempt, user required to be petitioner.");
+            }
         }
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
