@@ -203,12 +203,33 @@ const ErrorMessage = styled.div`
 `;
 
 
+const Notification = styled.div`
+  background-color: ${(props) => (props.type === "success" ? "#4caf50" : "#f44336")};
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  margin: 20px auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+`;
+
 
 const PetitionList = () => {
   const [petitions, setPetitions] = useState([]);
   const [selectedPetition, setSelectedPetition] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [error, setError] = useState(null);
+
+  const [notification, setNotification] = useState("");
+  const [notificationType, setNotificationType] = useState("");
+
 
   const status = ["All", "Open", "Closed"];
 
@@ -237,12 +258,19 @@ const PetitionList = () => {
   const handleSignPetition = async (petitionId) => {
     try {
       await SignPetitionService.signPetition(petitionId);
-      alert("Petition signed successfully!");
-  
-      // Refresh petitions after signing
-      setSelectedStatus("All"); // or re-fetch petitions for the current status
+
+      setNotification("Petition signed successfully!");
+      setNotificationType("success");
+      
+      setSelectedStatus("All");
+
+      setTimeout(() => setNotification(""), 3000);
     } catch (err) {
-      setError(err.message);
+      setNotification("Failed to sign the petition.");
+      setNotificationType("error");
+
+      // Clear notification after 4 seconds
+      setTimeout(() => setNotification(""), 4000);
     }
   };
   
@@ -253,6 +281,7 @@ const PetitionList = () => {
 
   return (
     <PetitionListContainer>
+      {notification && <Notification type={notificationType}>{notification}</Notification>}
       <ListTitle>{selectedStatus} Petitions</ListTitle>
       <ToggleButtonGroup>
         {status.map((status) => (
