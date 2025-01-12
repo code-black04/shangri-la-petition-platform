@@ -34,7 +34,6 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
     @PostConstruct
     public void createDefaultPetitionCommitteeAdmin() {
         String adminEmail = "admin@petition.parliament.sr";
-        //TODO String defaultPassword = "2025%shangrila";, this one has to be used while submitting the assignment
         String defaultPassword = "2025%shangrila";
 
         // Check if the admin already exists
