@@ -14,7 +14,8 @@ const WelcomePageContainer = styled.div`
 `;
 
 const LogoImageContainer = styled.img`
-  height: 100px;
+  height: 140px;
+  width: 160px;
   margin-bottom: 10px;
 `;
 
@@ -32,7 +33,7 @@ const RoleSelectionContainer = styled.div`
 `;
 
 const RoleCard = styled.div`
-  width: 200px;
+  width: 150px;
   padding: 20px;
   background-color: ${({ isSelected }) => (isSelected ? '#333' : '#1c1c1c')};
   border: ${({ isSelected }) => (isSelected ? '2px solid white' : 'none')};

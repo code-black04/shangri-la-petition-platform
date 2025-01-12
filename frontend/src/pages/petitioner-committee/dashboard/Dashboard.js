@@ -134,13 +134,6 @@ const Dashboard = () => {
         </NavButton>
 
         <NavButton
-          $isActive={activeTab === "profile"}
-          onClick={() => setActiveTab("profile")}
-        >
-          Profile
-        </NavButton>
-
-        <NavButton
           $isActive={activeTab === "logout"}
           onClick={() => setActiveTab("logout")}
         >
