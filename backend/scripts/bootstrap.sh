@@ -11,7 +11,3 @@ cd ../../
 echo $PWD
 cd docker/tomcat || exit
 docker build -t shangri-la-petition-platform-image -f Dockerfile .
-cd ../../
-echo $PWD
-cd docker/app || exit
-docker build -t shangrila-petition-platform-image -f Dockerfile .
