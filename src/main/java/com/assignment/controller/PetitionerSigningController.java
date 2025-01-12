@@ -13,10 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(path = "/petitioner/auth")
+@RequestMapping(path = "/api/petitioner/auth")
 public class PetitionerSigningController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionerSigningController.class);
@@ -116,5 +118,29 @@ public class PetitionerSigningController {
             );
             return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(path = "/logout", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<MessageDto> logoutUser(
+            @RequestBody @Valid SigningInRequest signingInRequest,
+            HttpServletResponse response
+    ) {
+        log.info("User with email {} is trying to logout", signingInRequest.getEmailId());
+
+        // Clear cookies
+        clearCookie("accessToken", response);
+        clearCookie("refreshToken", response); // Add other cookies if necessary
+
+        // Return response
+        return new ResponseEntity<>(new MessageDto(HttpStatus.OK, "Logout successful"), HttpStatus.OK);
+    }
+
+    private void clearCookie(String cookieName, HttpServletResponse response) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // Expire the cookie immediately
+        cookie.setSecure(true); // Ensure it's secure if using HTTPS
+        response.addCookie(cookie);
     }
 }

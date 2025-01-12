@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")  // Allow CORS for all paths
-                        .allowedOrigins("http://localhost:3000")  // Replace with your frontend URL
+                        .allowedOrigins("http://localhost")  // Replace with your frontend URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Allowed methods
                         .allowedHeaders("*")  // Allow all headers
                         .allowCredentials(true);  // Allow credentials (cookies, authorization headers)

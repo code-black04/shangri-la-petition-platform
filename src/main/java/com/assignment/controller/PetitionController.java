@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/slpp")
+@RequestMapping(path = "/api/slpp")
 public class PetitionController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionController.class);

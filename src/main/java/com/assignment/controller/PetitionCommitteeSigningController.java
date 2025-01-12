@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/petition-committee/auth")
+@RequestMapping(path = "/api/petition-committee/auth")
 public class PetitionCommitteeSigningController {
 
     private static final Logger log = LoggerFactory.getLogger(PetitionCommitteeSigningController.class);
