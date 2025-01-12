@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import logo from '../../../logo.svg';
-import { SlppSigningContainer, LogoImageContainer, FormContainer, InputRow, InputRowGroup, Input, SigningButtonContainer, ButtonGroup, ButtonRow, Button, QRScannerContainer, QRScannerArea, QRScannerCancelButton} from "../signup/SignUpStyle.js";
+import { SlppSigningContainer, LogoImageContainer, FormContainer, InputRow, InputRowGroup, Input, SigningButtonContainer, ButtonGroup, ButtonRow, Button, QRScannerContainer, QRScannerArea, QRScannerCancelButton, PageHeader} from "../signup/SignUpStyle.js";
 import PetitionerSignUpService from "./PetitionerSignUpService.js";
 import { useNavigate } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
@@ -104,6 +104,9 @@ function SignUpPage (){
         <SlppSigningContainer>
         <MessageBanner type={messageType} message={message} />
         <LogoImageContainer src={logo} alt="logo" />
+
+        <PageHeader>Petitioner Registration</PageHeader>
+
         <FormContainer onSubmit={handleSignupForm}>
             <InputRow>
                 <InputRowGroup>
