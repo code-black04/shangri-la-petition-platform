@@ -46,6 +46,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/api/slpp/petition/threshold").hasRole("COMMITTEE")
                 .antMatchers("/api/petition-committee/**").hasRole("COMMITTEE") // Only ADMIN role can access
                 .antMatchers("/api/slpp/petitions").hasRole("USER")
+                .antMatchers("/api/slpp/petitions").hasRole("COMMITTEE")
                 .antMatchers("/api/slpp/petitions/signature").hasRole("USER")
                 .antMatchers("/api/slpp/petition/2/update").hasRole("COMMITTEE")// USER and ADMIN roles can access
                 .anyRequest().authenticated()

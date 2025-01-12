@@ -47,16 +47,12 @@ public class PetitionController {
             && petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
             throw new BadRequestException("The petition cannot be closed upon creation. Please set the status to 'Open'.");
         }
-        if (petitionDto.getSignature() != null
-            && petitionDto.getSignature() != 1) {
-            throw new BadRequestException("The number of signatures must be exactly 1, indicating your support for the petition.");
-        }
         if (petitionDto.getResponse() != null && !petitionDto.getResponse().isEmpty()) {
             throw  new BadRequestException("Only the petition committee can publish a response. Please leave the response field empty.");
         }
         petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);
         petitionDto.setPetitioner(authentication.getName());
-        petitionDto.setSignature(1);
+        petitionDto.setSignature(0);
         petitionDto.setResponse(null);
         petitionDto.setPetitionDate(LocalDate.now());
         log.info("Request: {}", petitionDto);
