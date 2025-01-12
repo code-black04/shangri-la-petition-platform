@@ -5,13 +5,11 @@ services:
     container_name: nginx
     ports:
       - "80:80"
-      - "3000:3000"
-      - "8090:8080"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
-      - whiteboard_two
+      - api
 
   db:
     container_name: shangri-la-petition-platform-postgres-container
@@ -40,7 +38,7 @@ services:
       context: docker/tomcat
       dockerfile: Dockerfile
     ports:
-      - "8090:8080"
+      - "8080:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://shangri-la-petition-platform-postgres-container:5432/slpp-db
       - SPRING_DATASOURCE_USERNAME=slpp-user
@@ -48,5 +46,17 @@ services:
     depends_on:
       - db
 
+  app:
+    container_name: shangrila-petition-platform-container
+    image: shangrila-petition-platform-image
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - "shangrila_petition_platform_node_modules:/app/node_modules"
+      - "./shangrila-petition-app:/app"
+
 volumes:
   shangri-la-petition-platform-db-data:
+  shangrila_petition_platform_node_modules:
+      name: shangrila_petition_platform_node_modules_volume
