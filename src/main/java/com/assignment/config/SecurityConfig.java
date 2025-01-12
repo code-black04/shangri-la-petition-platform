@@ -35,40 +35,11 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Autowired
     JwtAuthFilter jwtAuthFilter;
 
-   /* @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/petitioner/auth/**").permitAll()
-                .antMatchers("/resources/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/petition-committee/**").hasRole("ADMIN") // Only ADMIN role can access
-                .antMatchers("/slpp/**").hasAnyRole("USER", "ADMIN") // USER and ADMIN roles can access
-                .anyRequest().authenticated() // All other endpoints require authentication
-                .and()
-                .sessionManagement()
-                .sessionFixation().migrateSession() // Default: protect against session fixation attacks
-                .maximumSessions(1) // Allow only one session per user
-                .and().and()
-                .csrf().disable()
-                .cors().configurationSource(corsFilter()).and()
-                .formLogin()
-                .loginPage("http://localhost:3000/petitioner")
-                .defaultSuccessUrl("http://localhost:3000/petitioner-dashboard", true)
-                .permitAll()
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("http://localhost/app/")
-                .permitAll();
-        return http.build();
-    }*/
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable().cors().configurationSource(corsFilter()).and()
                 .authorizeRequests()
-                .antMatchers("/api/petitioner/auth/signup", "/api/petitioner/auth/login3", "/swagger-ui/**",
+                .antMatchers("/api/petitioner/auth/signup", "/api/petitioner/auth/login", "/swagger-ui/**",
                         "/api/resources/**", "/api/petitioner/auth/logout").permitAll()
                 .and()
                 .authorizeRequests()
@@ -79,27 +50,21 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/api/slpp/petition/2/update").hasRole("COMMITTEE")// USER and ADMIN roles can access
                 .anyRequest().authenticated()
                 .and()
-               /* .logout()
-                .logoutUrl("/api/petitioner/auth/logout")
-                .logoutSuccessUrl("/app/")
-                .and()*/
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
-
     }
-
 
 
     @Bean
     public UrlBasedCorsConfigurationSource corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); // Allow cookies across origins
-        config.addAllowedOriginPattern("*"); // Use "*" for all origins or specify your frontend URL
-        config.addAllowedHeader("*"); // Allow all headers
-        config.addAllowedMethod("*"); // Allow all HTTP methods (GET, POST, etc.)
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -5,8 +5,10 @@ import com.assignment.auth.JwtResponseDTO;
 import com.assignment.dto.MessageDto;
 import com.assignment.dto.SigningInRequest;
 import com.assignment.dto.PetitionerDto;
+import com.assignment.entity.PetitionerEntity;
 import com.assignment.exception.DuplicateAccountException;
 import com.assignment.exception.UnauthorizedAccessException;
+import com.assignment.repository.PetitionerRepository;
 import com.assignment.service.JwtService;
 import com.assignment.service.PetitionerSigningService;
 import com.assignment.utils.BiometricIdManager;
@@ -44,152 +46,118 @@ public class PetitionerSigningController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private PetitionerRepository userRepository;
+
+    @Autowired
     private JwtService jwtService;
 
     public PetitionerSigningController(PetitionerSigningService petitionerSigningService,
-                                       BiometricIdManager biometricIdManager, AuthenticationManager authenticationManager){
-            this.petitionerSigningService = petitionerSigningService;
-            this.biometricIdManager = biometricIdManager;
-            this.authenticationManager = authenticationManager;
+                                       BiometricIdManager biometricIdManager, AuthenticationManager authenticationManager) {
+        this.petitionerSigningService = petitionerSigningService;
+        this.biometricIdManager = biometricIdManager;
+        this.authenticationManager = authenticationManager;
+    }
+
+    @RequestMapping(path = "/signup",
+            method = RequestMethod.POST,
+            consumes = {"application/json"},
+            produces = {"application/json"})
+    public ResponseEntity<MessageDto> signUpPetitioner(
+            @RequestBody @Valid PetitionerDto petitionerDto
+    ) {
+        log.info("Request: {}", petitionerDto);
+
+        String biometricId = petitionerDto.getBiometricId();
+
+        // Check if the BioID is already used
+        if (biometricIdManager.isBioIdUsed(biometricId)) {
+            log.error("BioID already used: {}", biometricId);
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.CONFLICT, "BioID already used: " + biometricId),
+                    HttpStatus.CONFLICT
+            );
         }
 
-        @RequestMapping(path = "/signup",
-                method = RequestMethod.POST,
-                consumes = {"application/json"},
-                produces = {"application/json"})
-        public ResponseEntity<MessageDto> signUpPetitioner (
-                @RequestBody @Valid PetitionerDto petitionerDto
-    ){
-            log.info("Request: {}", petitionerDto);
-
-            String biometricId = petitionerDto.getBiometricId();
-
-            // Check if the BioID is already used
-            if (biometricIdManager.isBioIdUsed(biometricId)) {
-                log.error("BioID already used: {}", biometricId);
-                return new ResponseEntity<>(
-                        new MessageDto(HttpStatus.CONFLICT, "BioID already used: " + biometricId),
-                        HttpStatus.CONFLICT
-                );
-            }
-
-            // Check if the BioID is valid and exists
-            if (!biometricIdManager.isBioIdValid(biometricId)) {
-                log.error("Biometric ID '{}' is invalid or not found", biometricId);
-                return new ResponseEntity<>(
-                        new MessageDto(HttpStatus.NOT_FOUND, "Biometric ID not found: " + biometricId),
-                        HttpStatus.NOT_FOUND
-                );
-            }
-
-
-            PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
-
-            if (userDto != null) {
-                // Use the BioID (move it to the used set)
-                biometricIdManager.useBiometricId(biometricId);
-                log.info("Signup successful for: {}", petitionerDto.getEmailId());
-                return new ResponseEntity<>(
-                        new MessageDto(HttpStatus.CREATED, "Signup successful for: " + petitionerDto.getEmailId()),
-                        HttpStatus.CREATED
-                );
-            } else {
-                log.error("Unsuccessful signup attempt for: {}", petitionerDto.getEmailId());
-                return new ResponseEntity<>(
-                        new MessageDto(HttpStatus.BAD_REQUEST, "Unsuccessful signup attempt"),
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-        }
-
-        @RequestMapping(path = "/login",
-                method = RequestMethod.POST,
-                produces = "application/json")
-        public ResponseEntity<MessageDto> signInUser (
-                @RequestBody @Valid SigningInRequest signingInRequest
-            ){
-            log.info("User with {} is trying to login", signingInRequest.getEmailId());
-
-            try {
-                Boolean isSignInSuccessful = petitionerSigningService.signInPetitioner(signingInRequest);
-                if (Boolean.TRUE.equals(isSignInSuccessful)) {
-                    MessageDto message = new MessageDto(
-                            HttpStatus.OK,
-                            "Successful login by " + signingInRequest.getEmailId()
-                    );
-                    log.info("Login successful for email '{}'", signingInRequest.getEmailId());
-                    return ResponseEntity.ok(message);
-                } else {
-                    log.error("Login failed for email '{}': Unauthorized attempt", signingInRequest.getEmailId());
-                    throw new UnauthorizedAccessException("Invalid credentials provided");
-                }
-            } catch (DuplicateAccountException ex) {
-                log.error("Duplicate account error: {}", ex.getMessage());
-                return new ResponseEntity<>(
-                        new MessageDto(HttpStatus.CONFLICT, ex.getMessage()),
-                        HttpStatus.CONFLICT
-                );
-            } catch (Exception e) {
-                log.error("An error occurred during login for email '{}': {}", signingInRequest.getEmailId(), e.getMessage(), e);
-                MessageDto errorMessage = new MessageDto(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "An unexpected error occurred. Please try again later."
-                );
-                return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        @RequestMapping(path = "/logout", method = RequestMethod.POST, produces = "application/json")
-        public ResponseEntity<MessageDto> logoutUser (
-                @RequestParam(required = false, name = "user") String user,
-                HttpServletResponse response
-    ){
-            log.info("User with email {} is trying to logout", user);
-
-            // Clear cookies
-            clearCookie("accessToken", response);
-            clearCookie("refreshToken", response); // Add other cookies if necessary
-
-            // Return response
-            return new ResponseEntity<>(new MessageDto(HttpStatus.OK, "Logout successful"), HttpStatus.OK);
-        }
-
-        private void clearCookie (String cookieName, HttpServletResponse response){
-            Cookie cookie = new Cookie(cookieName, null);
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(0);
-            cookie.setDomain("localhost");// Expire the cookie immediately
-            cookie.setSecure(false); // Ensure it's secure if using HTTPS
-            response.addCookie(cookie);
+        // Check if the BioID is valid and exists
+        if (!biometricIdManager.isBioIdValid(biometricId)) {
+            log.error("Biometric ID '{}' is invalid or not found", biometricId);
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.NOT_FOUND, "Biometric ID not found: " + biometricId),
+                    HttpStatus.NOT_FOUND
+            );
         }
 
 
-        @PostMapping("/login3")
-        @CrossOrigin(origins = "http://localhost", allowCredentials = "true")
-        public JwtResponseDTO AuthenticateAndGetToken (@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse
-        response){
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
-            if (authentication.isAuthenticated()) {
+        PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
 
-                String accessToken = jwtService.GenerateToken(authRequestDTO.getUsername(), authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
-                // set accessToken to cookie header
-                ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
-                        .httpOnly(true)
-                        .secure(false)
-                        .path("/")
-                        .domain("localhost")
-                        //.sameSite("None")
-                        .maxAge(1800000)
-                        .build();
-                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-                JwtResponseDTO jwt = new JwtResponseDTO();
-                jwt.setAccessToken(accessToken);
-                return jwt;
-
-            } else {
-                throw new UsernameNotFoundException("invalid user request..!!");
-            }
-
+        if (userDto != null) {
+            // Use the BioID (move it to the used set)
+            biometricIdManager.useBiometricId(biometricId);
+            log.info("Signup successful for: {}", petitionerDto.getEmailId());
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.CREATED, "Signup successful for: " + petitionerDto.getEmailId()),
+                    HttpStatus.CREATED
+            );
+        } else {
+            log.error("Unsuccessful signup attempt for: {}", petitionerDto.getEmailId());
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.BAD_REQUEST, "Unsuccessful signup attempt"),
+                    HttpStatus.BAD_REQUEST
+            );
         }
     }
+
+
+    @RequestMapping(path = "/logout", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<MessageDto> logoutUser(
+            @RequestParam(required = false, name = "user") String user,
+            HttpServletResponse response
+    ) {
+        log.info("User with email {} is trying to logout", user);
+        clearCookie("accessToken", response);
+     return new ResponseEntity<>(new MessageDto(HttpStatus.OK, "Logout successful"), HttpStatus.OK);
+    }
+
+    private void clearCookie(String cookieName, HttpServletResponse response) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+            cookie.setHttpOnly(false);
+        cookie.setMaxAge(0);
+        cookie.setDomain("localhost");
+        cookie.setSecure(false);
+        response.addCookie(cookie);
+    }
+
+
+    @PostMapping("/login")
+    @CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+    public JwtResponseDTO authenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse
+            response) {
+        if(authRequestDTO.isAdmin()){
+            PetitionerEntity user = userRepository.findPetitionerByEmailId(authRequestDTO.getUsername());
+            if(user != null && !Boolean.TRUE.equals(user.isCommitteeAdmin())){
+                throw new UnauthorizedAccessException("Unauthorized login attempt, user not a committee member");
+            }
+        }
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
+        if (authentication.isAuthenticated()) {
+            String accessToken = jwtService.GenerateToken(authRequestDTO.getUsername(), authentication.getAuthorities()
+                    .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+            ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                        .httpOnly(false)
+                    .secure(false)
+                    .path("/")
+                    .domain("localhost")
+                    .maxAge(1800000)
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            JwtResponseDTO jwt = new JwtResponseDTO();
+            jwt.setAccessToken(accessToken);
+            return jwt;
+        } else {
+            throw new UsernameNotFoundException("invalid user request..!!");
+        }
+
+    }
+}
