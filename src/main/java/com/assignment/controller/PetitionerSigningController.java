@@ -141,10 +141,10 @@ public class PetitionerSigningController {
 
         @RequestMapping(path = "/logout", method = RequestMethod.POST, produces = "application/json")
         public ResponseEntity<MessageDto> logoutUser (
-                @RequestBody @Valid SigningInRequest signingInRequest,
+                @RequestParam(required = false, name = "user") String user,
                 HttpServletResponse response
     ){
-            log.info("User with email {} is trying to logout", signingInRequest.getEmailId());
+            log.info("User with email {} is trying to logout", user);
 
             // Clear cookies
             clearCookie("accessToken", response);
@@ -158,8 +158,9 @@ public class PetitionerSigningController {
             Cookie cookie = new Cookie(cookieName, null);
             cookie.setPath("/");
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(0); // Expire the cookie immediately
-            cookie.setSecure(true); // Ensure it's secure if using HTTPS
+            cookie.setMaxAge(0);
+            cookie.setDomain("localhost");// Expire the cookie immediately
+            cookie.setSecure(false); // Ensure it's secure if using HTTPS
             response.addCookie(cookie);
         }
 

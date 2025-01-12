@@ -68,7 +68,8 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable().cors().configurationSource(corsFilter()).and()
                 .authorizeRequests()
-                .antMatchers("/api/petitioner/auth/signup", "/api/petitioner/auth/login3", "/swagger-ui/**", "/api/resources/**").permitAll()
+                .antMatchers("/api/petitioner/auth/signup", "/api/petitioner/auth/login3", "/swagger-ui/**",
+                        "/api/resources/**", "/api/petitioner/auth/logout").permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/slpp/petition/threshold").hasRole("COMMITTEE")
@@ -78,10 +79,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/api/slpp/petition/2/update").hasRole("COMMITTEE")// USER and ADMIN roles can access
                 .anyRequest().authenticated()
                 .and()
-                .logout()
+               /* .logout()
                 .logoutUrl("/api/petitioner/auth/logout")
                 .logoutSuccessUrl("/app/")
-                .and()
+                .and()*/
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
