@@ -125,20 +125,6 @@ const Dashboard = () => {
         </SubNav>
 
         <NavButton
-          isActive={activeTab === "analytics"}
-          onClick={() => setActiveTab("analytics")}
-        >
-          Analytics
-        </NavButton>
-
-        <NavButton
-          isActive={activeTab === "profile"}
-          onClick={() => setActiveTab("profile")}
-        >
-          Profile
-        </NavButton>
-
-        <NavButton
           isActive={activeTab === "logout"}
           onClick={() => setActiveTab("logout")}
         >

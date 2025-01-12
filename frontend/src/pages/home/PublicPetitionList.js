@@ -191,7 +191,7 @@ const PetitionList = () => {
           throw new Error("No Petition Found");
         }
         const data = await response.json();
-        setPetitions(data);
+        setPetitions(data.petitions);
         setError(null);
       } catch (err) {
         setError(err.message);

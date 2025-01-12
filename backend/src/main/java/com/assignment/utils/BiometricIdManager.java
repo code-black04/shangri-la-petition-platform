@@ -11,13 +11,9 @@ public class BiometricIdManager {
 
     private final Set<String> biometricIds;
 
-    private final Set<String> usedBiometricIds;
-
 
     public BiometricIdManager() {
         biometricIds = new HashSet<>();
-        usedBiometricIds = new HashSet<>();
-
         biometricIds.add("K1YL8VA2HG");
         biometricIds.add("7DMPYAZAP2");
         biometricIds.add("D05HPPQNJ4");
@@ -70,18 +66,6 @@ public class BiometricIdManager {
         biometricIds.add("8OLYIE2FRC");
     }
 
-    public synchronized boolean useBiometricId(String id) {
-        // Check if the ID exists and is unused
-        if (biometricIds.remove(id)) {
-            usedBiometricIds.add(id); // Move to used set
-            return true;
-        }
-        return false; // Already used or not found
-    }
-
-    public boolean isBioIdUsed(String id) {
-        return usedBiometricIds.contains(id);
-    }
 
     public boolean isBioIdValid(String id) {
         return biometricIds.contains(id);
@@ -91,7 +75,4 @@ public class BiometricIdManager {
         return biometricIds;
     }
 
-    public Set<String> getUsedBiometricIds() {
-        return usedBiometricIds;
-    }
 }
