@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  shangrila-petition-platform:
+    container_name: shangrila-petition-platform-container
+    image: shangrila-petition-platform-image
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - "shangrila_petition_platform_node_modules:/app/node_modules"
+      - ".:/app"
+
+volumes:
+  shangrila_petition_platform_node_modules:
+    name: shangrila_petition_platform_node_modules_volume
