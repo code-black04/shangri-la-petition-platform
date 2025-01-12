@@ -17,7 +17,8 @@ public class SLPPAuthUser implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        SimpleGrantedAuthority roleUser = new SimpleGrantedAuthority(Boolean.TRUE.equals(user.isCommitteeAdmin()) ?  "ROLE_COMMITTEE": "ROLE_USER");
+        return List.of(roleUser);
     }
 
     @Override

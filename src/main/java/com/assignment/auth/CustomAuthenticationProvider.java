@@ -2,10 +2,14 @@ package com.assignment.auth;
 
 import com.assignment.controller.PetitionerSigningController;
 import com.assignment.dto.SigningInRequest;
+import com.assignment.entity.PetitionerEntity;
 import com.assignment.exception.UnauthorizedAccessException;
+import com.assignment.repository.PetitionerRepository;
 import com.assignment.service.PetitionerSigningService;
+import jdk.jfr.BooleanFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,6 +22,9 @@ import java.util.Collections;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final PetitionerSigningService petitionerSigningService;
     private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
+    @Autowired
+    private PetitionerRepository userRepository;
+
     public CustomAuthenticationProvider(PetitionerSigningService petitionerSigningService) {
         this.petitionerSigningService = petitionerSigningService;
     }
@@ -35,11 +42,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new UnauthorizedAccessException("Unauthorized login attempt");
         }
         // Replace with your custom authentication logic
-
-            return new UsernamePasswordAuthenticationToken(
+        PetitionerEntity petitionerByEmailId = userRepository.findPetitionerByEmailId(signingInRequest.getEmailId());
+        SimpleGrantedAuthority roleUser = new SimpleGrantedAuthority(Boolean.FALSE.equals(petitionerByEmailId.isCommitteeAdmin()) ? "ROLE_USER" : "ROLE_COMMITTEE");
+        return new UsernamePasswordAuthenticationToken(
                 username, 
                 password, 
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                Collections.singletonList(roleUser)
             );
 
     }

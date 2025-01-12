@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class PetitionerSigningServiceImpl implements PetitionerSigningService {
 
@@ -32,6 +34,27 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
         this.petitionerRepository = petitionerRepository;
     }
 
+    @PostConstruct
+    public void createDefaultPetitionCommitteeAdmin() {
+        String adminEmail = "admin@petition.parliament.sr";
+        //TODO String defaultPassword = "2025%shangrila";, this one has to be used while submitting the assignment
+        String defaultPassword = "2025@shangrila";
+
+        // Check if the admin already exists
+        if (petitionerRepository.findPetitionerByEmailId(adminEmail) != null) {
+            log.info("Default admin already exists: {}", adminEmail);
+            return;
+        }
+
+        PetitionerEntity petitionCommitteeEntity = new PetitionerEntity();
+        petitionCommitteeEntity.setEmailId(adminEmail);
+        petitionCommitteeEntity.setCommitteeAdmin(true);
+        petitionCommitteeEntity.setPassword(encoder.encode(defaultPassword));
+
+        petitionerRepository.save(petitionCommitteeEntity);
+        log.info("Default admin created successfully with email: {}", adminEmail);
+
+    }
 
     @Override
     public PetitionerDto signUpPetitioner(PetitionerDto petitionerDto) throws DuplicateAccountException {

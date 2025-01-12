@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,7 +41,7 @@ public class PetitionController {
             consumes = { "application/json" },
             produces = { "application/json" })
     public ResponseEntity<PetitionDto> createPetition(
-            @RequestBody @Valid PetitionDto petitionDto
+            @RequestBody @Valid PetitionDto petitionDto, Authentication authentication
     ) {
         if (petitionDto.getPetitionStatusEnum() != null
             && petitionDto.getPetitionStatusEnum().equals(PetitionStatusEnum.CLOSED)) {
@@ -54,6 +55,7 @@ public class PetitionController {
             throw  new BadRequestException("Only the petition committee can publish a response. Please leave the response field empty.");
         }
         petitionDto.setPetitionStatusEnum(PetitionStatusEnum.OPEN);
+        petitionDto.setPetitioner(authentication.getName());
         petitionDto.setSignature(1);
         petitionDto.setResponse(null);
         petitionDto.setPetitionDate(LocalDate.now());
@@ -103,9 +105,10 @@ public class PetitionController {
                     produces = "application/json")
     public ResponseEntity<MessageDto> signOpenPetition(
             @RequestParam Integer petitionId,
-            @RequestParam String emailId
+            @RequestParam String emailId,
+            Authentication authentication
     ) {
-        boolean signedSuccessfully = petitionService.signOpenPetition(petitionId, emailId);
+        boolean signedSuccessfully = petitionService.signOpenPetition(petitionId, authentication.getName());
         if (!signedSuccessfully) {
             log.error("Un-successful signature  attempt");
             throw new BadRequestException("Un-successful signature attempt");

@@ -33,6 +33,9 @@ public class PetitionerEntity {
     @Column(name = "biometric_id")
     private String biometricId;
 
+    @Column(name = "committee_admin")
+    private Boolean isCommitteeAdmin;
+
     public String getFirstName() {
         return firstName;
     }
@@ -79,5 +82,13 @@ public class PetitionerEntity {
 
     public void setBiometricId(String biometricId) {
         this.biometricId = biometricId;
+    }
+
+    public Boolean isCommitteeAdmin() {
+        return isCommitteeAdmin;
+    }
+
+    public void setCommitteeAdmin(Boolean committeeAdmin) {
+        isCommitteeAdmin = committeeAdmin;
     }
 }
