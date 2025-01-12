@@ -315,30 +315,44 @@ const PetitionList = () => {
         updatedPetition
       );
 
-      setNotification("Petition updated successfully!"); // Success message
-      setNotificationType("success");
+      if(data.status === 201) {
+        setNotification("Petition updated successfully!"); // Success message
+        setNotificationType("success");
+        setTimeout(() => {
+          setNotification("");
+          closeModal();
+        }, 2000);
 
-  
-      setPetitions((prev) => {
-        const updatedList =  prev.map((petition) =>
-          petition.petition_id === selectedPetition.petition_id
-            ? { ...petition, ...data }
-            : petition
-        );
-        return updatedList.sort((a, b) => a.petition_id - b.petition_id);
-      });
-  
-      setTimeout(() => {
-        setNotification("");
-        closeModal();
-      }, 2000);
+        setPetitions((prev) => {
+          const updatedList =  prev.map((petition) =>
+            petition.petition_id === selectedPetition.petition_id
+              ? { ...petition, ...data }
+              : petition
+          );
+          return updatedList.sort((a, b) => a.petition_id - b.petition_id);
+        });
+      } else {
+        if (data.status === 400) {
+          const errorMessage = "Invalid input for Status or Result.."
+          setNotification(errorMessage);
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
+        } else {
+          setNotification("An unexpected error occurred");
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
+        }
+      }
     } catch (error) {
-      console.error("Error updating petition:", error);
-      setNotification(error.message); // Display error message
-      setNotificationType("error");
-
-      // Clear the notification after 4 seconds
-      setTimeout(() => setNotification(""), 2000);
+      setNotification("An unexpected error occurred during login. Please try again.");
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
     }
   };
   
@@ -368,7 +382,8 @@ const PetitionList = () => {
                 <TableHeader>Id</TableHeader>
                 <TableHeader>Date</TableHeader>
                 <TableHeader>Title</TableHeader>
-                <TableHeader>Signature</TableHeader>
+                <TableHeader>Signatures</TableHeader>
+                <TableHeader>Petition Status</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </tr>
             </thead>
@@ -379,6 +394,7 @@ const PetitionList = () => {
                   <TableCell>{petition.petition_date}</TableCell>
                   <TableCell>{petition.petition_title}</TableCell>
                   <TableCell>{petition.signature} / {petition.signature_threshold}</TableCell>
+                  <TableCell>{petition.status}</TableCell>
                   <TableCell>
                     <ViewButton onClick={() => handleEditClick(petition)}>
                       {petition.status.toLowerCase() === "open"

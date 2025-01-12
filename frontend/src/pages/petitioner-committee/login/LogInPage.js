@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import logo from '../../../logo.svg';
-import { SlppSigningContainer, LogoImageContainer, FormContainer, InputRow, InputRowGroup, Input, SigningButtonContainer, ButtonGroup, ButtonRow, Button} from "../login/LogInStyle.js";
+import { SlppSigningContainer, LogoImageContainer, FormContainer, InputRow, InputRowGroup, Input, SigningButtonContainer, ButtonGroup, ButtonRow, Button, PageHeader} from "../login/LogInStyle.js";
 import { useNavigate } from 'react-router-dom';
 import PetitionerCommitteeSignInService from "./PetitionerCommitteeSignInService";
+import MessageBanner from "../../petitioner/signup/MessageBanner.js"
 
 function SignInForm () {
 const [emailId, setEmailId] = useState('');
@@ -10,6 +11,9 @@ const [password, setPassword] = useState('');
 const [showPassword, setShowPassword] = useState(false);
 
 const navigate = useNavigate();
+
+const [message, setMessage] = useState(''); // To store success or error message
+const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
 const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -26,14 +30,27 @@ const handleSignInForm = async (event) => {
         const signInresponse = await PetitionerCommitteeSignInService.getUser(petitionerCommitteeSignInData);
         
         if (signInresponse.status === 200) {
-            navigate("/app/petition-committee-dashboard");
+            setMessageType('success');
+            setMessage('Sign-in successful! Redirecting...');
+            setTimeout(() => navigate("/app/petition-committee-dashboard"), 2000);
         }
         else {
-            alert(await signInresponse.json());
+            setMessageType('error');
+            if (signInresponse.status === 403) {
+                setMessage('Incorrect Credentials, please try again.'); // Set only the first error message
+                setTimeout(() => {
+                    setMessage('');
+                  }, 3000);
+            } else {
+            setMessage('Sign-in failed. Please try again.');
+            setTimeout(() => {
+                setMessage('');
+                }, 3000);
+            }
         }
     } catch (error) {
-        console.error("Error during login:", error);
-        
+        setMessageType('error');
+        setMessage('An unexpected error occurred during login. Please try again.');
     }
 
 };
@@ -44,7 +61,9 @@ const onBackToHomepage = () => {
 
 return (
     <SlppSigningContainer>
+    <MessageBanner type={messageType} message={message} />
     <LogoImageContainer src={logo} alt="logo" />
+    <PageHeader>Petition Committee Login</PageHeader>
     <FormContainer onSubmit={handleSignInForm}>
 
         <InputRow>

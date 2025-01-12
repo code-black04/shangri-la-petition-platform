@@ -40,12 +40,12 @@ const handleSignInForm = async (event) => {
                 setTimeout(() => {
                     setMessage('');
                   }, 3000);
-              } else {
-                setMessage('Sign-in failed. Please try again.');
-                setTimeout(() => {
-                    setMessage('');
-                  }, 3000);
-              }
+            } else {
+            setMessage('Sign-in failed. Please try again.');
+            setTimeout(() => {
+                setMessage('');
+                }, 3000);
+            }
         }
     } catch (error) {
         setMessageType('error');
