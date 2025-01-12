@@ -31,8 +31,8 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
     @Override
     public PetitionerDto signUpPetitioner(PetitionerDto petitionerDto) throws DuplicateAccountException {
         if (petitionerRepository.findPetitionerByEmailId(petitionerDto.getEmailId()) != null) {
-            log.error("Account with {} already exists.", petitionerDto.getEmailId());
-            throw new DuplicateAccountException("Account with " + petitionerDto.getEmailId() + "already exists. Try again!");
+            log.error("Account with {} already exists. ", petitionerDto.getEmailId());
+            throw new DuplicateAccountException("Account with " + petitionerDto.getEmailId() + " already exists. Try again!");
         }
 
         PetitionerEntity petitionerEntity = petitionerDtoEntityMapper.convertToPetitionerEntity(petitionerDto);

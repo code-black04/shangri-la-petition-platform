@@ -3,6 +3,7 @@ package com.assignment.controller;
 import com.assignment.dto.MessageDto;
 import com.assignment.dto.SigningInRequest;
 import com.assignment.dto.PetitionerDto;
+import com.assignment.exception.DuplicateAccountException;
 import com.assignment.exception.UnauthorizedAccessException;
 import com.assignment.service.PetitionerSigningService;
 import com.assignment.utils.BiometricIdManager;
@@ -59,12 +60,13 @@ public class PetitionerSigningController {
             );
         }
 
-        // Use the BioID (move it to the used set)
-        biometricIdManager.useBiometricId(biometricId);
+
 
         PetitionerDto userDto = petitionerSigningService.signUpPetitioner(petitionerDto);
 
         if (userDto != null) {
+            // Use the BioID (move it to the used set)
+            biometricIdManager.useBiometricId(biometricId);
             log.info("Signup successful for: {}", petitionerDto.getEmailId());
             return new ResponseEntity<>(
                     new MessageDto(HttpStatus.CREATED, "Signup successful for: " + petitionerDto.getEmailId()),
@@ -100,6 +102,12 @@ public class PetitionerSigningController {
                 log.error("Login failed for email '{}': Unauthorized attempt", signingInRequest.getEmailId());
                 throw new UnauthorizedAccessException("Invalid credentials provided");
             }
+        } catch (DuplicateAccountException ex) {
+            log.error("Duplicate account error: {}", ex.getMessage());
+            return new ResponseEntity<>(
+                    new MessageDto(HttpStatus.CONFLICT, ex.getMessage()),
+                    HttpStatus.CONFLICT
+            );
         } catch (Exception e) {
             log.error("An error occurred during login for email '{}': {}", signingInRequest.getEmailId(), e.getMessage(), e);
             MessageDto errorMessage = new MessageDto(
