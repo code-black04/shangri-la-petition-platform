@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./backend/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
       - api
@@ -15,7 +15,7 @@ services:
     container_name: shangri-la-petition-platform-postgres-container
     image: shangri-la-petition-platform-postgres-image
     build:
-      context: docker/postgres
+      context: backend/docker/postgres
       dockerfile: Dockerfile
     environment:
       POSTGRES_DB: slpp-db
@@ -35,7 +35,7 @@ services:
     container_name: shangri-la-petition-platform-container
     image: shangri-la-petition-platform-image
     build:
-      context: docker/tomcat
+      context: backend/docker/tomcat
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
@@ -49,6 +49,9 @@ services:
   app:
     container_name: shangrila-petition-platform-container
     image: shangrila-petition-platform-image
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
     stdin_open: true
     ports:
       - "3000:3000"
