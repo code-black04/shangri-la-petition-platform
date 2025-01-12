@@ -8,16 +8,21 @@ import com.assignment.exception.PetitionNotFoundException;
 import com.assignment.service.PetitionService;
 import io.swagger.models.Response;
 import javassist.NotFoundException;
+import org.mockito.internal.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/slpp")
@@ -68,31 +73,27 @@ public class PetitionController {
         return response;
     }
 
-    @RequestMapping(path = "/petitions",
-            method = RequestMethod.GET,
-            produces = { "application/json" })
-    public ResponseEntity<List<PetitionDto>> getAllPetitions() throws PetitionNotFoundException {
-        List<PetitionDto> petitionDtoList = petitionService.getAllPetitions();
-
-        if (petitionDtoList.isEmpty()) {
-            log.error("No petition exists");
-            throw new PetitionNotFoundException("No petition exists");
-        }
-        log.info("All Petitions provided");
-        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(petitionDtoList, HttpStatus.OK);
-        return responseEntity;
-    }
-
-    @RequestMapping(path = "/petition", method = RequestMethod.GET,
+    @RequestMapping(path = "/petitions", method = RequestMethod.GET,
                     produces = {"application/json"})
-    public ResponseEntity<List<PetitionDto>> getAllPetitionsByStatus(@RequestParam String status) throws PetitionNotFoundException {
-        List<PetitionDto> allPetitionByStatus = petitionService.getAllPetitionsByStatus(status);
-        if (allPetitionByStatus == null) {
-            log.error("No petition exist with {} status", status);
-            throw new PetitionNotFoundException("No petition exist with " + status + " status");
+    public ResponseEntity<Map<String, List<PetitionDto>>> getAllPetitionsByStatus(@RequestParam(required = false) String status) throws PetitionNotFoundException {
+
+        List<PetitionDto> petitionDtoList = new ArrayList<>();
+
+        if (StringUtils.isEmpty(status)) {
+            petitionDtoList = petitionService.getAllPetitions();
+        } else {
+            petitionDtoList = petitionService.getAllPetitionsByStatus(status);
         }
 
-        ResponseEntity<List<PetitionDto>> responseEntity = new ResponseEntity<>(allPetitionByStatus, HttpStatus.OK);
+        if (petitionDtoList == null) {
+            log.info("No petition exist..");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Map<String, List<PetitionDto>> listMap = new HashMap<>();
+        listMap.put("petitions", petitionDtoList);
+
+        ResponseEntity<Map<String, List<PetitionDto>>> responseEntity = new ResponseEntity<>(listMap, HttpStatus.OK);
         return responseEntity;
     }
 
