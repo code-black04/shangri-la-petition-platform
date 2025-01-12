@@ -382,7 +382,7 @@ const PetitionList = () => {
                 <TableHeader>Id</TableHeader>
                 <TableHeader>Date</TableHeader>
                 <TableHeader>Title</TableHeader>
-                <TableHeader>Signatures</TableHeader>
+                <TableHeader>Signatures/Threshold</TableHeader>
                 <TableHeader>Petition Status</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </tr>
@@ -432,7 +432,7 @@ const PetitionList = () => {
               </FormRow>
               <FormRow>
                 <Label>Petitioner:</Label>
-                <ReadOnlyField>value={selectedPetition.petitioner}</ReadOnlyField>
+                <ReadOnlyField>{selectedPetition.petitioner}</ReadOnlyField>
               </FormRow>
               <FormRow>
                   <Label>Status:</Label>
