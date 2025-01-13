@@ -48,7 +48,7 @@ const PetitionList = () => {
 
   const handleSignPetition = async (petitionId) => {
     try {
-      await SignPetitionService.signPetition(petitionId);
+      await SignPetitionService.signPetition(petitionId, currentUserEmail);
 
       // Update the specific petition in the local state
       setPetitions((prevPetitions) =>

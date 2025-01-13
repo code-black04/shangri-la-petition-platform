@@ -1,8 +1,7 @@
 const API_URL = 'http://localhost/api/slpp/petitions/signature';
 
 class SignPetitionService {
-    async signPetition(petitionId) {
-        const emailId = 'pm4525@gmail.com';//TODO - get from profile or token
+    async signPetition(petitionId, emailId) {
         const response =  await fetch(`${API_URL}?petitionId=${petitionId}&emailId=${emailId}`, {
           method: "PUT",
           headers: {
