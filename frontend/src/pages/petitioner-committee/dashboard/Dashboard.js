@@ -6,6 +6,73 @@ import ThresholdManagement from "./components/ThresholdManagement.js";
 import Analytics from "./components/Analytics.js"
 import Logout from "./components/Logout.js"
 
+
+const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState("petitionList");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
+
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "petitionList":
+        return <PetitionList />;
+      case "analytics":
+        return <Analytics/>
+      case "threshold":
+        return <ThresholdManagement/>;
+      case "logout":
+        return <Logout />;
+    }
+  };
+
+  return (
+    <DashboardContainer>
+      <Sidebar>
+        <LogoImageContainer src={logo} alt="Logo" />
+        <NavButton onClick={toggleDropdown} $isActive={["petitionList"].includes(activeTab)}>
+          Petition
+          <span>{isDropdownOpen ? "▼" : "▶"}</span>
+        </NavButton>
+        <SubNav $isVisible={isDropdownOpen}>
+          <SubNavItem $isActive={activeTab === "petitionList"} onClick={() => setActiveTab("petitionList")}>
+            All Petitions
+          </SubNavItem>
+        </SubNav>
+
+        <NavButton
+          $isActive={activeTab === "threshold"}
+          onClick={() => setActiveTab("threshold")}>
+          Threshold Management
+        </NavButton>
+
+        <NavButton
+          $isActive={activeTab === "analytics"}
+          onClick={() => setActiveTab("analytics")}>
+          Analytics
+        </NavButton>
+
+        <NavButton
+          $isActive={activeTab === "logout"}
+          onClick={() => setActiveTab("logout")}
+        >
+          Logout
+        </NavButton>
+
+      </Sidebar>
+      <MainContent>
+        <ContentTitle>
+          {activeTab === "petitionList"}
+        </ContentTitle>
+        {renderContent()}
+      </MainContent>
+    </DashboardContainer>
+  );
+};
+
+export default Dashboard;
+
+
 const DashboardContainer = styled.div`
   display: flex;
   height: 100vh;
@@ -87,68 +154,3 @@ const ContentTitle = styled.h1`
   font-weight: 500;
   margin-bottom: 20px;
 `;
-
-const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("petitionList");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
-
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "petitionList":
-        return <PetitionList />;
-      case "analytics":
-        return <Analytics/>
-      case "threshold":
-        return <ThresholdManagement/>;
-      case "logout":
-        return <Logout />;
-    }
-  };
-
-  return (
-    <DashboardContainer>
-      <Sidebar>
-        <LogoImageContainer src={logo} alt="Logo" />
-        <NavButton onClick={toggleDropdown} $isActive={["petitionList"].includes(activeTab)}>
-          Petition
-          <span>{isDropdownOpen ? "▼" : "▶"}</span>
-        </NavButton>
-        <SubNav $isVisible={isDropdownOpen}>
-          <SubNavItem $isActive={activeTab === "petitionList"} onClick={() => setActiveTab("petitionList")}>
-            All Petitions
-          </SubNavItem>
-        </SubNav>
-
-        <NavButton
-          $isActive={activeTab === "threshold"}
-          onClick={() => setActiveTab("threshold")}>
-          Threshold Management
-        </NavButton>
-
-        <NavButton
-          $isActive={activeTab === "analytics"}
-          onClick={() => setActiveTab("analytics")}>
-          Analytics
-        </NavButton>
-
-        <NavButton
-          $isActive={activeTab === "logout"}
-          onClick={() => setActiveTab("logout")}
-        >
-          Logout
-        </NavButton>
-
-      </Sidebar>
-      <MainContent>
-        <ContentTitle>
-          {activeTab === "petitionList"}
-        </ContentTitle>
-        {renderContent()}
-      </MainContent>
-    </DashboardContainer>
-  );
-};
-
-export default Dashboard;

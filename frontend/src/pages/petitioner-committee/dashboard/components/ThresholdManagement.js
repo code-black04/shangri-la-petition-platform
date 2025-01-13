@@ -2,6 +2,64 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import PetitionDecisionService from "../service/PetitionDecisionService";
 
+
+const ThresholdManagement = () => {
+  const [currentThreshold, setCurrentThreshold] = useState(1); // Holds the current threshold fetched from backend
+  const [threshold, setThreshold] = useState(1); // Holds the new value to be set
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const fetchThreshold = async () => {
+      try {
+        const currentThreshold = await PetitionDecisionService.getThreshold();
+        setCurrentThreshold(currentThreshold);
+        setThreshold(currentThreshold); // Initialize dropdown to current threshold
+      } catch (error) {
+        console.error("Error fetching threshold:", error.message);
+        setMessage("Failed to fetch current threshold");
+      }
+    };
+
+    fetchThreshold();
+  }, []);
+
+  const handleSetThreshold = async () => {
+    try {
+      await PetitionDecisionService.updateThreshold(threshold);
+      setCurrentThreshold(threshold); // Update current threshold after successful API call
+      setMessage("Threshold updated successfully!");
+    } catch (error) {
+      console.error("Error updating threshold:", error.message);
+      setMessage("Failed to update threshold");
+    }
+  };
+
+  return (
+    <ThresholdContainer>
+      <Label>Current Signature Threshold</Label>
+      <CurrentThreshold>{currentThreshold}</CurrentThreshold>
+
+      <Label>Set New Signature Threshold</Label>
+      <Dropdown
+        value={threshold}
+        onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
+      >
+        {[...Array(50)].map((_, i) => (
+          <option key={i + 1} value={i + 1}>
+            {i + 1}
+          </option>
+        ))}
+      </Dropdown>
+      <SetButton onClick={handleSetThreshold}>Set</SetButton>
+
+      {message && <Message success={message.includes("successfully")}>{message}</Message>}
+    </ThresholdContainer>
+  );
+};
+
+export default ThresholdManagement;
+
+
 const ThresholdContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -75,59 +133,3 @@ const Message = styled.div`
   color: ${(props) => (props.success ? "#00ff88" : "#ff4d4f")};
   text-align: center;
 `;
-
-const ThresholdManagement = () => {
-  const [currentThreshold, setCurrentThreshold] = useState(1); // Holds the current threshold fetched from backend
-  const [threshold, setThreshold] = useState(1); // Holds the new value to be set
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const fetchThreshold = async () => {
-      try {
-        const currentThreshold = await PetitionDecisionService.getThreshold();
-        setCurrentThreshold(currentThreshold);
-        setThreshold(currentThreshold); // Initialize dropdown to current threshold
-      } catch (error) {
-        console.error("Error fetching threshold:", error.message);
-        setMessage("Failed to fetch current threshold");
-      }
-    };
-
-    fetchThreshold();
-  }, []);
-
-  const handleSetThreshold = async () => {
-    try {
-      await PetitionDecisionService.updateThreshold(threshold);
-      setCurrentThreshold(threshold); // Update current threshold after successful API call
-      setMessage("Threshold updated successfully!");
-    } catch (error) {
-      console.error("Error updating threshold:", error.message);
-      setMessage("Failed to update threshold");
-    }
-  };
-
-  return (
-    <ThresholdContainer>
-      <Label>Current Signature Threshold</Label>
-      <CurrentThreshold>{currentThreshold}</CurrentThreshold>
-
-      <Label>Set New Signature Threshold</Label>
-      <Dropdown
-        value={threshold}
-        onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
-      >
-        {[...Array(50)].map((_, i) => (
-          <option key={i + 1} value={i + 1}>
-            {i + 1}
-          </option>
-        ))}
-      </Dropdown>
-      <SetButton onClick={handleSetThreshold}>Set</SetButton>
-
-      {message && <Message success={message.includes("successfully")}>{message}</Message>}
-    </ThresholdContainer>
-  );
-};
-
-export default ThresholdManagement;

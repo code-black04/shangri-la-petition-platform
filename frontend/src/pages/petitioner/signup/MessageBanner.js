@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const MessageBanner = ({ type, message }) => {
+  if (!message) return null; // Do not render if no message
+  return <Banner type={type}>{message}</Banner>;
+};
+
+export default MessageBanner;
+
 const Banner = styled.div`
   white-space: pre-wrap; /* Preserve line breaks */
   padding: 10px 20px;
@@ -20,11 +27,3 @@ const Banner = styled.div`
                                   props.type === 'warning' ? '#ffeeba' : 
                                   '#b8daff')};
 `;
-
-
-const MessageBanner = ({ type, message }) => {
-  if (!message) return null; // Do not render if no message
-  return <Banner type={type}>{message}</Banner>;
-};
-
-export default MessageBanner;

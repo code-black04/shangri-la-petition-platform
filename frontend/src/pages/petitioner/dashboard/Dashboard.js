@@ -6,6 +6,68 @@ import PetitionList from "./components/PetitionList";
 import Logout from "./Logout";
 
 
+const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState("petitionList");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
+
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "petitionList":
+        return <PetitionList />;
+      case "createPetition":
+        return <CreatePetition />;
+      case "logout":
+              return <Logout />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <DashboardContainer>
+      <Sidebar>
+        <LogoImageContainer src={logo} alt="Logo" />
+        <NavButton onClick={toggleDropdown} isActive={["petitionList", "createPetition", "proposedPetitions", "signedPetitions"].includes(activeTab)}>
+          Petition
+          <span>{isDropdownOpen ? "▼" : "▶"}</span>
+        </NavButton>
+        <SubNav $isVisible={isDropdownOpen}>
+          <SubNavItem isActive={activeTab === "petitionList"} onClick={() => setActiveTab("petitionList")}>
+            All Petitions
+          </SubNavItem>
+          <SubNavItem isActive={activeTab === "createPetition"} onClick={() => setActiveTab("createPetition")}>
+            Create Petition
+          </SubNavItem>
+        </SubNav>
+
+        <NavButton
+          isActive={activeTab === "logout"}
+          onClick={() => setActiveTab("logout")}
+        >
+          Logout
+        </NavButton>
+
+      </Sidebar>
+      <MainContent>
+        <ContentTitle>
+          {activeTab === "petitionList"
+            ? ""
+            : activeTab === "createPetition"
+            ? ""
+            : ""}
+        </ContentTitle>
+        {renderContent()}
+      </MainContent>
+    </DashboardContainer>
+  );
+};
+
+export default Dashboard;
+
+
+
 const DashboardContainer = styled.div`
   display: flex;
   height: 100vh;
@@ -87,63 +149,3 @@ const ContentTitle = styled.h1`
   font-weight: 500;
   margin-bottom: 20px;
 `;
-
-const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("petitionList");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
-
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "petitionList":
-        return <PetitionList />;
-      case "createPetition":
-        return <CreatePetition />;
-      case "logout":
-              return <Logout />;
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <DashboardContainer>
-      <Sidebar>
-        <LogoImageContainer src={logo} alt="Logo" />
-        <NavButton onClick={toggleDropdown} isActive={["petitionList", "createPetition", "proposedPetitions", "signedPetitions"].includes(activeTab)}>
-          Petition
-          <span>{isDropdownOpen ? "▼" : "▶"}</span>
-        </NavButton>
-        <SubNav $isVisible={isDropdownOpen}>
-          <SubNavItem isActive={activeTab === "petitionList"} onClick={() => setActiveTab("petitionList")}>
-            All Petitions
-          </SubNavItem>
-          <SubNavItem isActive={activeTab === "createPetition"} onClick={() => setActiveTab("createPetition")}>
-            Create Petition
-          </SubNavItem>
-        </SubNav>
-
-        <NavButton
-          isActive={activeTab === "logout"}
-          onClick={() => setActiveTab("logout")}
-        >
-          Logout
-        </NavButton>
-
-      </Sidebar>
-      <MainContent>
-        <ContentTitle>
-          {activeTab === "petitionList"
-            ? ""
-            : activeTab === "createPetition"
-            ? ""
-            : ""}
-        </ContentTitle>
-        {renderContent()}
-      </MainContent>
-    </DashboardContainer>
-  );
-};
-
-export default Dashboard;
