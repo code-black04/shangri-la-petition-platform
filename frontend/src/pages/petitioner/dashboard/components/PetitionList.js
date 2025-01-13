@@ -4,6 +4,188 @@ import GetAllPetitionService from "../service/GetAllPetitionService.js";
 import SignPetitionService from "../service/SignPetitionService.js";
 import { getCurrentUser } from "../../utils/AuthUtils.js";
 
+const PetitionList = () => {
+  const [petitions, setPetitions] = useState([]);
+  const [selectedPetition, setSelectedPetition] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [error, setError] = useState(null);
+
+  const [notification, setNotification] = useState("");
+  const [notificationType, setNotificationType] = useState("");
+
+  const currentUserEmail = getCurrentUser();
+
+
+  const status = ["All", "Open", "Closed"];
+
+  useEffect(() => {
+    const fetchPetitions = async (status) => {
+      try {
+        const response = await GetAllPetitionService.getAllPetitions(status);
+        if (!response.ok) {
+          throw new Error("No Petition Found");
+        }
+        const data = await response.json();
+        setPetitions(data.petitions);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchPetitions(selectedStatus);
+  }, [selectedStatus]);
+
+  const isPetitionerSigned = (petition) => {
+    return petition.petitionSigningUserEntityList.some(
+      (signingUser) => signingUser.emailId === currentUserEmail
+    );
+  };
+
+  const handleViewClick = (petition) => {
+    setSelectedPetition(petition); // Set the clicked petition as selected
+  };
+
+  const handleSignPetition = async (petitionId) => {
+    try {
+      await SignPetitionService.signPetition(petitionId);
+
+      // Update the specific petition in the local state
+      setPetitions((prevPetitions) =>
+        prevPetitions.map((petition) =>
+          petition.petition_id === petitionId
+            ? {
+                ...petition,
+                signature: petition.signature + 1,
+                petitionSigningUserEntityList: [
+                  ...petition.petitionSigningUserEntityList,
+                  { petition_id: petitionId, emailId: currentUserEmail }, // Add the current user
+                ],
+              }
+            : petition
+        )
+      );
+
+      setNotification("Petition signed successfully!");
+      setNotificationType("success");
+      
+      setSelectedStatus("All");
+
+      setTimeout(() => setNotification(""), 3000);
+    } catch (err) {
+      setNotification("Failed to sign the petition.");
+      setNotificationType("error");
+
+      // Clear notification after 4 seconds
+      setTimeout(() => setNotification(""), 4000);
+    }
+  };
+  
+
+  const closeModal = () => {
+    setSelectedPetition(null); // Deselect the petition to close modal
+  };
+
+  return (
+    <PetitionListContainer>
+      {notification && <Notification type={notificationType}>{notification}</Notification>}
+      <ListTitle>{selectedStatus} Petitions</ListTitle>
+      <ToggleButtonGroup>
+        {status.map((status) => (
+          <ToggleButton
+            key={status}
+            active={selectedStatus === status}
+            onClick={() => setSelectedStatus(status)}
+          >
+            {status}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      
+      {error ? (
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : (
+        <TableWrapper>
+          <Table>
+            <thead>
+              <tr>
+                <TableHeader>Id</TableHeader>
+                <TableHeader>Date</TableHeader>
+                <TableHeader>Title</TableHeader>
+                <TableHeader>Signatures</TableHeader>
+                <TableHeader>Status</TableHeader>
+                <TableHeader>Information</TableHeader>
+                <TableHeader>Signed Status</TableHeader>
+              </tr>
+            </thead>
+            <tbody>
+              {petitions.map((petition) => (
+                <TableRow key={petition.petition_id}>
+                  <TableCell>{petition.petition_id}</TableCell>
+                  <TableCell>{petition.petition_date}</TableCell>
+                  <TableCell>{petition.petition_title}</TableCell>
+                  <TableCell>{petition.signature}</TableCell>
+                  <TableCell>{petition.status}</TableCell>
+                  <TableCell>
+                    <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
+                  </TableCell>
+                  <TableCell>
+                    {petition.status === "Open" ? (
+                      isPetitionerSigned(petition) ? (
+                        <p>Signed</p>
+                      ) : (
+                        <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
+                          Sign
+                        </ViewButton>
+                      )
+                    ) : (
+                      <p>-</p>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </Table>
+          </TableWrapper>
+      )}
+
+{selectedPetition && (
+        <>
+          <Overlay onClick={closeModal} />
+          <Modal>
+            <h3>Petition Details</h3>
+            <FormContainer>
+              <FormRow>
+                <Label>ID:</Label>
+                <Input type="text" value={selectedPetition.petition_id} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Title:</Label>
+                <Input type="text" value={selectedPetition.petition_title} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Content:</Label>
+                <TextArea value={selectedPetition.petition_text} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Petitioner:</Label>
+                <Input type="text" value={selectedPetition.petitioner} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Result:</Label>
+                <Input type="text" value={selectedPetition.response} readOnly />
+              </FormRow>
+            </FormContainer>
+            <CloseButton onClick={closeModal}>Close</CloseButton>
+          </Modal>
+        </>
+      )}
+    </PetitionListContainer>
+  );
+};
+
+export default PetitionList;
+
 const PetitionListContainer = styled.div`
   background: #1e1e1e;
   border: 1px solid #333;
@@ -220,186 +402,3 @@ const Notification = styled.div`
   transform: translateX(-50%);
   z-index: 1000;
 `;
-
-
-const PetitionList = () => {
-  const [petitions, setPetitions] = useState([]);
-  const [selectedPetition, setSelectedPetition] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [error, setError] = useState(null);
-
-  const [notification, setNotification] = useState("");
-  const [notificationType, setNotificationType] = useState("");
-
-  const currentUserEmail = getCurrentUser();
-
-
-  const status = ["All", "Open", "Closed"];
-
-  useEffect(() => {
-    const fetchPetitions = async (status) => {
-      try {
-        const response = await GetAllPetitionService.getAllPetitions(status);
-        if (!response.ok) {
-          throw new Error("No Petition Found");
-        }
-        const data = await response.json();
-        setPetitions(data.petitions);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchPetitions(selectedStatus);
-  }, [selectedStatus]);
-
-  const isPetitionerSigned = (petition) => {
-    return petition.petitionSigningUserEntityList.some(
-      (signingUser) => signingUser.emailId === currentUserEmail
-    );
-  };
-
-  const handleViewClick = (petition) => {
-    setSelectedPetition(petition); // Set the clicked petition as selected
-  };
-
-  const handleSignPetition = async (petitionId) => {
-    try {
-      await SignPetitionService.signPetition(petitionId);
-
-      // Update the specific petition in the local state
-      setPetitions((prevPetitions) =>
-        prevPetitions.map((petition) =>
-          petition.petition_id === petitionId
-            ? {
-                ...petition,
-                signature: petition.signature + 1,
-                petitionSigningUserEntityList: [
-                  ...petition.petitionSigningUserEntityList,
-                  { petition_id: petitionId, emailId: currentUserEmail }, // Add the current user
-                ],
-              }
-            : petition
-        )
-      );
-
-      setNotification("Petition signed successfully!");
-      setNotificationType("success");
-      
-      setSelectedStatus("All");
-
-      setTimeout(() => setNotification(""), 3000);
-    } catch (err) {
-      setNotification("Failed to sign the petition.");
-      setNotificationType("error");
-
-      // Clear notification after 4 seconds
-      setTimeout(() => setNotification(""), 4000);
-    }
-  };
-  
-
-  const closeModal = () => {
-    setSelectedPetition(null); // Deselect the petition to close modal
-  };
-
-  return (
-    <PetitionListContainer>
-      {notification && <Notification type={notificationType}>{notification}</Notification>}
-      <ListTitle>{selectedStatus} Petitions</ListTitle>
-      <ToggleButtonGroup>
-        {status.map((status) => (
-          <ToggleButton
-            key={status}
-            active={selectedStatus === status}
-            onClick={() => setSelectedStatus(status)}
-          >
-            {status}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-      
-      {error ? (
-        <ErrorMessage>{error}</ErrorMessage>
-      ) : (
-        <TableWrapper>
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Id</TableHeader>
-                <TableHeader>Date</TableHeader>
-                <TableHeader>Title</TableHeader>
-                <TableHeader>Signatures</TableHeader>
-                <TableHeader>Status</TableHeader>
-                <TableHeader>Information</TableHeader>
-                <TableHeader>Signed Status</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {petitions.map((petition) => (
-                <TableRow key={petition.petition_id}>
-                  <TableCell>{petition.petition_id}</TableCell>
-                  <TableCell>{petition.petition_date}</TableCell>
-                  <TableCell>{petition.petition_title}</TableCell>
-                  <TableCell>{petition.signature}</TableCell>
-                  <TableCell>{petition.status}</TableCell>
-                  <TableCell>
-                    <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
-                  </TableCell>
-                  <TableCell>
-                    {petition.status === "Open" ? (
-                      isPetitionerSigned(petition) ? (
-                        <p>Signed</p>
-                      ) : (
-                        <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
-                          Sign
-                        </ViewButton>
-                      )
-                    ) : (
-                      <p>-</p>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
-          </TableWrapper>
-      )}
-
-{selectedPetition && (
-        <>
-          <Overlay onClick={closeModal} />
-          <Modal>
-            <h3>Petition Details</h3>
-            <FormContainer>
-              <FormRow>
-                <Label>ID:</Label>
-                <Input type="text" value={selectedPetition.petition_id} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Title:</Label>
-                <Input type="text" value={selectedPetition.petition_title} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Content:</Label>
-                <TextArea value={selectedPetition.petition_text} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Petitioner:</Label>
-                <Input type="text" value={selectedPetition.petitioner} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Result:</Label>
-                <Input type="text" value={selectedPetition.response} readOnly />
-              </FormRow>
-            </FormContainer>
-            <CloseButton onClick={closeModal}>Close</CloseButton>
-          </Modal>
-        </>
-      )}
-    </PetitionListContainer>
-  );
-};
-
-export default PetitionList;

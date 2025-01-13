@@ -14,12 +14,6 @@ class PetitionDecisionService {
       credentials: 'include',
     });
 
-    // if (!response.ok) {
-    //   const errorResponse = await response.json();
-    //   const errorMessage = errorResponse.errorMessage || "Failed to update the petition.";
-    //   throw new Error(errorMessage);
-    // }
-
     // Return a success message
     return response;
   }

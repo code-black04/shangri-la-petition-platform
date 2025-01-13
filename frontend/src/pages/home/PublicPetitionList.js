@@ -2,6 +2,127 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import GetAllPetitionService from "../petitioner/dashboard/service/GetAllPetitionService.js";
 
+const PublicPetitionList = () => {
+  const [petitions, setPetitions] = useState([]);
+  const [selectedPetition, setSelectedPetition] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [error, setError] = useState(null);
+
+  const status = ["All", "Open", "Closed"];
+
+  useEffect(() => {
+    const fetchPetitions = async (status) => {
+      try {
+        const response = await GetAllPetitionService.getAllPetitions(status);
+        if (!response.ok) {
+          throw new Error("No Petition Found");
+        }
+        const data = await response.json();
+        setPetitions(data.petitions);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchPetitions(selectedStatus);
+  }, [selectedStatus]);
+
+  const handleViewClick = (petition) => {
+    console.log("Selected Petition: ", petition);
+    setSelectedPetition(petition);
+  };
+
+  const closeModal = () => {
+    setSelectedPetition(null);
+  };
+
+  return (
+    <PetitionListContainer>
+      <ListTitle>{selectedStatus} Petitions</ListTitle>
+      <ToggleButtonGroup>
+        {status.map((status) => (
+          <ToggleButton
+            key={status}
+            active={selectedStatus === status}
+            onClick={() => setSelectedStatus(status)}
+          >
+            {status}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+
+      {error ? (
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : (
+        <TableWrapper>
+          <Table>
+            <thead>
+              <tr>
+                <TableHeader>Id</TableHeader>
+                <TableHeader>Date</TableHeader>
+                <TableHeader>Title</TableHeader>
+                <TableHeader>Signatures Received</TableHeader>
+                <TableHeader>Status</TableHeader>
+                <TableHeader>More Information</TableHeader>
+              </tr>
+            </thead>
+            <tbody>
+              {petitions.map((petition) => (
+                <TableRow key={petition.petition_id}>
+                  <TableCell>{petition.petition_id}</TableCell>
+                  <TableCell>{petition.petition_date}</TableCell>
+                  <TableCell>{petition.petition_title}</TableCell>
+                  <TableCell>{petition.signature}</TableCell>
+                  <TableCell>{petition.status}</TableCell>
+                  <TableCell>
+                    <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </Table>
+        </TableWrapper>
+      )}
+
+      {selectedPetition && (
+        <>
+          <Overlay onClick={closeModal} />
+          <Modal>
+            <h3>Petition Details</h3>
+            <FormContainer>
+              <FormRow>
+                <Label>ID:</Label>
+                <Input type="text" value={selectedPetition.petition_id || "N/A"} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Title:</Label>
+                <Input type="text" value={selectedPetition.petition_title || "N/A"} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Content:</Label>
+                <TextArea value={selectedPetition.petition_text || "N/A"} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Petitioner:</Label>
+                <Input type="text" value={selectedPetition.petitioner || "N/A"} readOnly />
+              </FormRow>
+              <FormRow>
+                <Label>Result:</Label>
+                <Input type="text" value={selectedPetition.response || "N/A"} readOnly />
+              </FormRow>
+            </FormContainer>
+            <CloseButton onClick={closeModal}>Close</CloseButton>
+          </Modal>
+        </>
+      )}
+    </PetitionListContainer>
+  );
+};
+
+export default PublicPetitionList;
+
+
 const PetitionListContainer = styled.div`
   min-height: 100vh;
   display: flex;
@@ -201,123 +322,3 @@ const ErrorMessage = styled.div`
   margin: 20px auto;
   box-shadow: 0 2px 10px rgba(255, 77, 79, 0.3);
 `;
-
-const PublicPetitionList = () => {
-  const [petitions, setPetitions] = useState([]);
-  const [selectedPetition, setSelectedPetition] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [error, setError] = useState(null);
-
-  const status = ["All", "Open", "Closed"];
-
-  useEffect(() => {
-    const fetchPetitions = async (status) => {
-      try {
-        const response = await GetAllPetitionService.getAllPetitions(status);
-        if (!response.ok) {
-          throw new Error("No Petition Found");
-        }
-        const data = await response.json();
-        setPetitions(data.petitions);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchPetitions(selectedStatus);
-  }, [selectedStatus]);
-
-  const handleViewClick = (petition) => {
-    console.log("Selected Petition: ", petition);
-    setSelectedPetition(petition);
-  };
-
-  const closeModal = () => {
-    setSelectedPetition(null);
-  };
-
-  return (
-    <PetitionListContainer>
-      <ListTitle>{selectedStatus} Petitions</ListTitle>
-      <ToggleButtonGroup>
-        {status.map((status) => (
-          <ToggleButton
-            key={status}
-            active={selectedStatus === status}
-            onClick={() => setSelectedStatus(status)}
-          >
-            {status}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-
-      {error ? (
-        <ErrorMessage>{error}</ErrorMessage>
-      ) : (
-        <TableWrapper>
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Id</TableHeader>
-                <TableHeader>Date</TableHeader>
-                <TableHeader>Title</TableHeader>
-                <TableHeader>Signatures Received</TableHeader>
-                <TableHeader>Status</TableHeader>
-                <TableHeader>More Information</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {petitions.map((petition) => (
-                <TableRow key={petition.petition_id}>
-                  <TableCell>{petition.petition_id}</TableCell>
-                  <TableCell>{petition.petition_date}</TableCell>
-                  <TableCell>{petition.petition_title}</TableCell>
-                  <TableCell>{petition.signature}</TableCell>
-                  <TableCell>{petition.status}</TableCell>
-                  <TableCell>
-                    <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
-        </TableWrapper>
-      )}
-
-      {selectedPetition && (
-        <>
-          <Overlay onClick={closeModal} />
-          <Modal>
-            <h3>Petition Details</h3>
-            <FormContainer>
-              <FormRow>
-                <Label>ID:</Label>
-                <Input type="text" value={selectedPetition.petition_id || "N/A"} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Title:</Label>
-                <Input type="text" value={selectedPetition.petition_title || "N/A"} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Content:</Label>
-                <TextArea value={selectedPetition.petition_text || "N/A"} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Petitioner:</Label>
-                <Input type="text" value={selectedPetition.petitioner || "N/A"} readOnly />
-              </FormRow>
-              <FormRow>
-                <Label>Result:</Label>
-                <Input type="text" value={selectedPetition.response || "N/A"} readOnly />
-              </FormRow>
-            </FormContainer>
-            <CloseButton onClick={closeModal}>Close</CloseButton>
-          </Modal>
-        </>
-      )}
-    </PetitionListContainer>
-  );
-};
-
-export default PublicPetitionList;

@@ -4,6 +4,229 @@ import GetAllPetitionService from "../service/GetAllPetitionService.js"
 import { FaEdit } from "react-icons/fa"; // Install react-icons if not already installed
 import PetitionDecisionService from "../service/PetitionDecisionService.js";
 
+const PetitionList = () => {
+  const [petitions, setPetitions] = useState([]);
+  const [selectedPetition, setSelectedPetition] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState("");
+  const [notificationType, setNotificationType] = useState("");
+
+  const [editableStatus, setEditableStatus] = useState("");
+  const [editableResult, setEditableResult] = useState("");
+  const [isEditable, setIsEditable] = useState(false);
+
+  const status = ["All", "Open", "Closed"];
+
+  useEffect(() => {
+    const fetchPetitions = async (status) => {
+      try {
+        const responseRecieved = await GetAllPetitionService.getAllPetitions(status);
+        if (!responseRecieved.ok) {
+          throw new Error("No Petition Found");
+        }
+        const data = await responseRecieved.json();
+        setPetitions(data.petitions);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchPetitions(selectedStatus);
+  }, [selectedStatus]);
+
+  const handleEditClick = (petition) => {
+    setSelectedPetition(petition);
+    setEditableStatus(petition.status || "");
+    setEditableResult(petition.response || "");
+    setIsEditable(petition.status.toLowerCase() === "open");
+  };
+
+
+  const closeModal = () => {
+    setSelectedPetition(null); // Deselect the petition to close modal
+    setIsEditable(false);
+  };
+
+  const handleSave = async () => {
+    const updatedPetition = {
+      status: editableStatus,
+      response: editableResult,
+    };
+  
+    try {
+      const data = await PetitionDecisionService.updatePetition(
+        selectedPetition.petition_id,
+        updatedPetition
+      );
+
+      if(data.status === 201) {
+        setNotification("Petition updated successfully!"); // Success message
+        setNotificationType("success");
+        setTimeout(() => {
+          setNotification("");
+          closeModal();
+        }, 2000);
+
+        setPetitions((prev) => {
+          const updatedList =  prev.map((petition) =>
+            petition.petition_id === selectedPetition.petition_id
+              ? { ...petition, ...data }
+              : petition
+          );
+          return updatedList.sort((a, b) => a.petition_id - b.petition_id);
+        });
+      } else {
+        if (data.status === 400) {
+          const errorMessage = "Invalid input for Status or Result.."
+          setNotification(errorMessage);
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
+        } else {
+          setNotification("An unexpected error occurred");
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
+        }
+      }
+    } catch (error) {
+      setNotification("An unexpected error occurred during login. Please try again.");
+          setTimeout(() => {
+            setNotification('');
+          }, 3000);
+          setNotificationType("error");
+    }
+  };
+  
+
+  return (
+    <PetitionListContainer>
+      <ListTitle>{selectedStatus} Petitions</ListTitle>
+      <ToggleButtonGroup>
+        {status.map((status) => (
+          <ToggleButton
+            key={status}
+            active={selectedStatus === status}
+            onClick={() => setSelectedStatus(status)}
+          >
+            {status}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      
+      {error ? (
+        <ErrorMessage>{error}</ErrorMessage>
+      ) : (
+        <TableWrapper>
+          <Table>
+            <thead>
+              <tr>
+                <TableHeader>Id</TableHeader>
+                <TableHeader>Date</TableHeader>
+                <TableHeader>Title</TableHeader>
+                <TableHeader>Signatures/Threshold</TableHeader>
+                <TableHeader>Petition Status</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </tr>
+            </thead>
+            <tbody>
+              {petitions.map((petition) => (
+                <TableRow key={petition.petition_id}>
+                  <TableCell>{petition.petition_id}</TableCell>
+                  <TableCell>{petition.petition_date}</TableCell>
+                  <TableCell>{petition.petition_title}</TableCell>
+                  <TableCell>{petition.signature} / {petition.signature_threshold}</TableCell>
+                  <TableCell>{petition.status}</TableCell>
+                  <TableCell>
+                    <ViewButton onClick={() => handleEditClick(petition)}>
+                      {petition.status.toLowerCase() === "open"
+                        ? "Edit"
+                        : "View"}
+                    </ViewButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </Table>
+          </TableWrapper>
+      )}
+
+{selectedPetition && (
+        <>
+          <Overlay onClick={closeModal} />
+          <Modal>
+          {notification && (
+            <Notification type={notificationType}>{notification}</Notification>
+          )}
+          <h3>{isEditable ? "Edit Petition" : "View Petition"}</h3>
+            <FormContainer>
+              <FormRow>
+                <Label>ID:</Label>
+                <ReadOnlyField>{selectedPetition.petition_id}</ReadOnlyField>
+              </FormRow>
+              <FormRow>
+                <Label>Title:</Label>
+                <ReadOnlyField>{selectedPetition.petition_title}</ReadOnlyField>
+              </FormRow>
+              <FormRow>
+                <Label>Content:</Label>
+                <ReadOnlyField>{selectedPetition.petition_text}</ReadOnlyField>
+              </FormRow>
+              <FormRow>
+                <Label>Petitioner:</Label>
+                <ReadOnlyField>{selectedPetition.petitioner}</ReadOnlyField>
+              </FormRow>
+              <FormRow>
+                  <Label>Status:</Label>
+                  {isEditable ? (
+                    <InputWrapper>
+                      <StyledInput
+                        type="text"
+                        value={editableStatus}
+                        onChange={(e) => setEditableStatus(e.target.value)}
+                      />
+                      <EditIcon />
+                    </InputWrapper>
+                  ) : (
+                    <ReadOnlyField>{editableStatus}</ReadOnlyField>
+                  )}
+                </FormRow>
+
+                <FormRow>
+                  <Label>Result:</Label>
+                  {isEditable ? (
+                    <InputWrapper>
+                      <StyledInput
+                        type="text"
+                        value={editableResult}
+                        onChange={(e) => setEditableResult(e.target.value)}
+                      />
+                      <EditIcon />
+                    </InputWrapper>
+                  ) : (
+                    <ReadOnlyField>{editableResult}</ReadOnlyField>
+                  )}
+                </FormRow>
+
+            </FormContainer>
+            <div>
+              {isEditable && <ViewButton onClick={handleSave}>Save</ViewButton>}
+              <CloseButton onClick={closeModal}>Close</CloseButton>
+            </div>
+          </Modal>
+        </>
+      )}
+    </PetitionListContainer>
+  );
+};
+
+export default PetitionList;
+
+
 const PetitionListContainer = styled.div`
   background: #1e1e1e;
   border: 1px solid #333;
@@ -256,226 +479,3 @@ const Notification = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   max-width: 600px;
 `;
-
-
-const PetitionList = () => {
-  const [petitions, setPetitions] = useState([]);
-  const [selectedPetition, setSelectedPetition] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [error, setError] = useState(null);
-  const [notification, setNotification] = useState("");
-  const [notificationType, setNotificationType] = useState("");
-
-  const [editableStatus, setEditableStatus] = useState("");
-  const [editableResult, setEditableResult] = useState("");
-  const [isEditable, setIsEditable] = useState(false);
-
-  const status = ["All", "Open", "Closed"];
-
-  useEffect(() => {
-    const fetchPetitions = async (status) => {
-      try {
-        const responseRecieved = await GetAllPetitionService.getAllPetitions(status);
-        if (!responseRecieved.ok) {
-          throw new Error("No Petition Found");
-        }
-        const data = await responseRecieved.json();
-        setPetitions(data.petitions);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchPetitions(selectedStatus);
-  }, [selectedStatus]);
-
-  const handleEditClick = (petition) => {
-    setSelectedPetition(petition);
-    setEditableStatus(petition.status || "");
-    setEditableResult(petition.response || "");
-    setIsEditable(petition.status.toLowerCase() === "open");
-  };
-
-
-  const closeModal = () => {
-    setSelectedPetition(null); // Deselect the petition to close modal
-    setIsEditable(false);
-  };
-
-  const handleSave = async () => {
-    const updatedPetition = {
-      status: editableStatus,
-      response: editableResult,
-    };
-  
-    try {
-      const data = await PetitionDecisionService.updatePetition(
-        selectedPetition.petition_id,
-        updatedPetition
-      );
-
-      if(data.status === 201) {
-        setNotification("Petition updated successfully!"); // Success message
-        setNotificationType("success");
-        setTimeout(() => {
-          setNotification("");
-          closeModal();
-        }, 2000);
-
-        setPetitions((prev) => {
-          const updatedList =  prev.map((petition) =>
-            petition.petition_id === selectedPetition.petition_id
-              ? { ...petition, ...data }
-              : petition
-          );
-          return updatedList.sort((a, b) => a.petition_id - b.petition_id);
-        });
-      } else {
-        if (data.status === 400) {
-          const errorMessage = "Invalid input for Status or Result.."
-          setNotification(errorMessage);
-          setTimeout(() => {
-            setNotification('');
-          }, 3000);
-          setNotificationType("error");
-        } else {
-          setNotification("An unexpected error occurred");
-          setTimeout(() => {
-            setNotification('');
-          }, 3000);
-          setNotificationType("error");
-        }
-      }
-    } catch (error) {
-      setNotification("An unexpected error occurred during login. Please try again.");
-          setTimeout(() => {
-            setNotification('');
-          }, 3000);
-          setNotificationType("error");
-    }
-  };
-  
-
-  return (
-    <PetitionListContainer>
-      <ListTitle>{selectedStatus} Petitions</ListTitle>
-      <ToggleButtonGroup>
-        {status.map((status) => (
-          <ToggleButton
-            key={status}
-            active={selectedStatus === status}
-            onClick={() => setSelectedStatus(status)}
-          >
-            {status}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-      
-      {error ? (
-        <ErrorMessage>{error}</ErrorMessage>
-      ) : (
-        <TableWrapper>
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Id</TableHeader>
-                <TableHeader>Date</TableHeader>
-                <TableHeader>Title</TableHeader>
-                <TableHeader>Signatures/Threshold</TableHeader>
-                <TableHeader>Petition Status</TableHeader>
-                <TableHeader>Actions</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {petitions.map((petition) => (
-                <TableRow key={petition.petition_id}>
-                  <TableCell>{petition.petition_id}</TableCell>
-                  <TableCell>{petition.petition_date}</TableCell>
-                  <TableCell>{petition.petition_title}</TableCell>
-                  <TableCell>{petition.signature} / {petition.signature_threshold}</TableCell>
-                  <TableCell>{petition.status}</TableCell>
-                  <TableCell>
-                    <ViewButton onClick={() => handleEditClick(petition)}>
-                      {petition.status.toLowerCase() === "open"
-                        ? "Edit"
-                        : "View"}
-                    </ViewButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
-          </TableWrapper>
-      )}
-
-{selectedPetition && (
-        <>
-          <Overlay onClick={closeModal} />
-          <Modal>
-          {notification && (
-            <Notification type={notificationType}>{notification}</Notification>
-          )}
-          <h3>{isEditable ? "Edit Petition" : "View Petition"}</h3>
-            <FormContainer>
-              <FormRow>
-                <Label>ID:</Label>
-                <ReadOnlyField>{selectedPetition.petition_id}</ReadOnlyField>
-              </FormRow>
-              <FormRow>
-                <Label>Title:</Label>
-                <ReadOnlyField>{selectedPetition.petition_title}</ReadOnlyField>
-              </FormRow>
-              <FormRow>
-                <Label>Content:</Label>
-                <ReadOnlyField>{selectedPetition.petition_text}</ReadOnlyField>
-              </FormRow>
-              <FormRow>
-                <Label>Petitioner:</Label>
-                <ReadOnlyField>{selectedPetition.petitioner}</ReadOnlyField>
-              </FormRow>
-              <FormRow>
-                  <Label>Status:</Label>
-                  {isEditable ? (
-                    <InputWrapper>
-                      <StyledInput
-                        type="text"
-                        value={editableStatus}
-                        onChange={(e) => setEditableStatus(e.target.value)}
-                      />
-                      <EditIcon />
-                    </InputWrapper>
-                  ) : (
-                    <ReadOnlyField>{editableStatus}</ReadOnlyField>
-                  )}
-                </FormRow>
-
-                <FormRow>
-                  <Label>Result:</Label>
-                  {isEditable ? (
-                    <InputWrapper>
-                      <StyledInput
-                        type="text"
-                        value={editableResult}
-                        onChange={(e) => setEditableResult(e.target.value)}
-                      />
-                      <EditIcon />
-                    </InputWrapper>
-                  ) : (
-                    <ReadOnlyField>{editableResult}</ReadOnlyField>
-                  )}
-                </FormRow>
-
-            </FormContainer>
-            <div>
-              {isEditable && <ViewButton onClick={handleSave}>Save</ViewButton>}
-              <CloseButton onClick={closeModal}>Close</CloseButton>
-            </div>
-          </Modal>
-        </>
-      )}
-    </PetitionListContainer>
-  );
-};
-
-export default PetitionList;

@@ -3,6 +3,92 @@ import styled from "styled-components";
 import CreatePetitionService from "../dashboard/service/CreatePetitionService.js";
 import MessageBanner from "../../petitioner/signup/MessageBanner.js"
 
+const CreatePetition = () => {
+
+  const today = new Date().toISOString().slice(0, 10);
+  const [petition_date, setPetitionDate] = useState(today);
+
+  const [petition_title, setPetitionTitle] = useState("");
+  const [petition_text, setPetitionText] = useState("");
+
+  const [message, setMessage] = useState(''); // To store success or error message
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log("Petition data:", { petition_date, petition_title, petition_text });
+    try {
+      const petitionCreationData = {petition_date, petition_title, petition_text};
+      const petitionCreationResponse = await CreatePetitionService.createPetition(petitionCreationData);
+
+      if(petitionCreationResponse.status === 201) {
+        setMessageType('success');
+        setMessage("Petition created successfully!");
+
+        setTimeout((() => {
+          setMessage("");
+          setMessageType('');
+          setPetitionText("");
+          setPetitionTitle("");
+        }), 2000);
+        
+      } else {
+        setMessageType('error');
+        setMessage("An expected error occurred, please try again..");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessageType('error');
+      setMessage("An expected error occurred, please try again..");
+    }
+  };
+
+  const handleClear = () => {
+    setPetitionTitle("");
+    setPetitionText("");
+  };
+
+  return (
+    <PetitionFormContainer>
+      <MessageBanner type={messageType} message={message} />
+      <FormTitle>Create New Petition</FormTitle>
+      <Form onSubmit={handleSubmit}>
+        <Label>Date</Label>
+        <Input type="text"
+          value={petition_date}
+          readOnly
+          required/>
+
+        <Label>Title</Label>
+        <Input
+          type="text"
+          placeholder="Enter petition title"
+          value={petition_title}
+          onChange={(e) => setPetitionTitle(e.target.value)}
+          required
+        />
+
+        <Label>Content</Label>
+        <TextArea
+          placeholder="Enter petition content"
+          value={petition_text}
+          onChange={(e) => setPetitionText(e.target.value)}
+          required
+        />
+
+        <ButtonRow>
+          <SubmitButton type="button" onClick={handleClear}>
+            Clear
+          </SubmitButton>
+          <SubmitButton type="submit">Submit</SubmitButton>
+        </ButtonRow>
+      </Form>
+    </PetitionFormContainer>
+  );
+};
+
+export default CreatePetition;
+
 const PetitionFormContainer = styled.div`
   background: #1e1e1e;
   border: 1px solid #333;
@@ -95,89 +181,3 @@ const SubmitButton = styled.button`
     outline: none;
   }
 `;
-
-const CreatePetition = () => {
-
-  const today = new Date().toISOString().slice(0, 10);
-  const [petition_date, setPetitionDate] = useState(today);
-
-  const [petition_title, setPetitionTitle] = useState("");
-  const [petition_text, setPetitionText] = useState("");
-
-  const [message, setMessage] = useState(''); // To store success or error message
-  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log("Petition data:", { petition_date, petition_title, petition_text });
-    try {
-      const petitionCreationData = {petition_date, petition_title, petition_text};
-      const petitionCreationResponse = await CreatePetitionService.createPetition(petitionCreationData);
-
-      if(petitionCreationResponse.status === 201) {
-        setMessageType('success');
-        setMessage("Petition created successfully!");
-
-        setTimeout((() => {
-          setMessage("");
-          setMessageType('');
-          setPetitionText("");
-          setPetitionTitle("");
-        }), 2000);
-        
-      } else {
-        setMessageType('error');
-        setMessage("An expected error occurred, please try again..");
-      }
-    } catch (error) {
-      console.error(error);
-      setMessageType('error');
-      setMessage("An expected error occurred, please try again..");
-    }
-  };
-
-  const handleClear = () => {
-    setPetitionTitle("");
-    setPetitionText("");
-  };
-
-  return (
-    <PetitionFormContainer>
-      <MessageBanner type={messageType} message={message} />
-      <FormTitle>Create New Petition</FormTitle>
-      <Form onSubmit={handleSubmit}>
-        <Label>Date</Label>
-        <Input type="text"
-          value={petition_date}
-          readOnly
-          required/>
-
-        <Label>Title</Label>
-        <Input
-          type="text"
-          placeholder="Enter petition title"
-          value={petition_title}
-          onChange={(e) => setPetitionTitle(e.target.value)}
-          required
-        />
-
-        <Label>Content</Label>
-        <TextArea
-          placeholder="Enter petition content"
-          value={petition_text}
-          onChange={(e) => setPetitionText(e.target.value)}
-          required
-        />
-
-        <ButtonRow>
-          <SubmitButton type="button" onClick={handleClear}>
-            Clear
-          </SubmitButton>
-          <SubmitButton type="submit">Submit</SubmitButton>
-        </ButtonRow>
-      </Form>
-    </PetitionFormContainer>
-  );
-};
-
-export default CreatePetition;

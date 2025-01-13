@@ -3,6 +3,67 @@ import styled from 'styled-components';
 import logo from "../../logo.svg";
 import { useNavigate } from 'react-router-dom';
 
+function Welcome() {
+  const [selectedRole, setSelectedRole] = useState(null);
+  const navigate = useNavigate();
+
+  const handleRoleSelection = (role) => {
+    setSelectedRole(role);
+  };
+
+  const handleContinue = () => {
+    if (selectedRole === 'Petitioner') {
+      navigate('/app/petitioner'); // Navigate to Petitioner page
+    }
+    if (selectedRole === 'Petitioner Committee') {
+      navigate('/app/petitioner-committee');
+    }
+  };
+
+  const handleViewPublicPetitions = () => {
+    navigate('/app/open-petition-list'); // Navigate to Petition List page
+  };
+
+  return (
+    <WelcomePageContainer>
+      <LogoImageContainer src={logo} alt="SLPP Logo" />
+      <WelcomeHeader>Welcome to Shangri-la Petition Platform</WelcomeHeader>
+
+      <RoleSelectionContainer>
+        <RoleCard
+          isSelected={selectedRole === 'Petitioner'}
+          onClick={() => handleRoleSelection('Petitioner')}
+        >
+          <RoleIcon>📜</RoleIcon>
+          <RoleTitle>Petitioner</RoleTitle>
+          <RoleDescription>Submit petitions and track their progress.</RoleDescription>
+        </RoleCard>
+        <RoleCard
+          isSelected={selectedRole === 'Petitioner Committee'}
+          onClick={() => handleRoleSelection('Petitioner Committee')}
+        >
+          <RoleIcon>👥</RoleIcon>
+          <RoleTitle>Petitioner Committee</RoleTitle>
+          <RoleDescription>Review and manage submitted petitions.</RoleDescription>
+        </RoleCard>
+      </RoleSelectionContainer>
+
+      <ContinueButton onClick={handleContinue} disabled={!selectedRole}>
+        Continue
+      </ContinueButton>
+
+      <PublicLinkSection>
+        <PublicLinkButton onClick={handleViewPublicPetitions}>
+          View Public Petition List
+        </PublicLinkButton>
+      </PublicLinkSection>
+
+    </WelcomePageContainer>
+  );
+}
+
+export default Welcome;
+
 const WelcomePageContainer = styled.div`
   text-align: center;
   background-color: #000104;
@@ -104,65 +165,3 @@ const PublicLinkButton = styled.a`
     background-color: #00a895;
   }
 `;
-
-
-function Welcome() {
-  const [selectedRole, setSelectedRole] = useState(null);
-  const navigate = useNavigate();
-
-  const handleRoleSelection = (role) => {
-    setSelectedRole(role);
-  };
-
-  const handleContinue = () => {
-    if (selectedRole === 'Petitioner') {
-      navigate('/app/petitioner'); // Navigate to Petitioner page
-    }
-    if (selectedRole === 'Petitioner Committee') {
-      navigate('/app/petitioner-committee');
-    }
-  };
-
-  const handleViewPublicPetitions = () => {
-    navigate('/app/open-petition-list'); // Navigate to Petition List page
-  };
-
-  return (
-    <WelcomePageContainer>
-      <LogoImageContainer src={logo} alt="SLPP Logo" />
-      <WelcomeHeader>Welcome to Shangri-la Petition Platform</WelcomeHeader>
-
-      <RoleSelectionContainer>
-        <RoleCard
-          isSelected={selectedRole === 'Petitioner'}
-          onClick={() => handleRoleSelection('Petitioner')}
-        >
-          <RoleIcon>📜</RoleIcon>
-          <RoleTitle>Petitioner</RoleTitle>
-          <RoleDescription>Submit petitions and track their progress.</RoleDescription>
-        </RoleCard>
-        <RoleCard
-          isSelected={selectedRole === 'Petitioner Committee'}
-          onClick={() => handleRoleSelection('Petitioner Committee')}
-        >
-          <RoleIcon>👥</RoleIcon>
-          <RoleTitle>Petitioner Committee</RoleTitle>
-          <RoleDescription>Review and manage submitted petitions.</RoleDescription>
-        </RoleCard>
-      </RoleSelectionContainer>
-
-      <ContinueButton onClick={handleContinue} disabled={!selectedRole}>
-        Continue
-      </ContinueButton>
-
-      <PublicLinkSection>
-        <PublicLinkButton onClick={handleViewPublicPetitions}>
-          View Public Petition List
-        </PublicLinkButton>
-      </PublicLinkSection>
-
-    </WelcomePageContainer>
-  );
-}
-
-export default Welcome;
