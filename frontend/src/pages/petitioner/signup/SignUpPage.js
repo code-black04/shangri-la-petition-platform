@@ -149,7 +149,7 @@ function SignUpPage (){
             <InputRow>
                 <InputRowGroup>
                     <label htmlFor="dateOfBirth:"></label>
-                    <Input type="text" id="dateOfBirth" placeholder="Date of Birth" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)}
+                    <Input type="text" id="dateOfBirth" placeholder="Date of Birth: YYYY-MM-DD" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)}
                     required></Input>
                 </InputRowGroup>
             </InputRow>
