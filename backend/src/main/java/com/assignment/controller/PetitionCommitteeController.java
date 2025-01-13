@@ -44,7 +44,7 @@ public class PetitionCommitteeController {
             @RequestBody @Valid PetitionCommitteeDecision petitionCommitteeDecision
     ) {
         if (petitionCommitteeDecision.getPetitionStatusEnum().equals(PetitionStatusEnum.OPEN))
-            throw new BadRequestException("The petition status cannot be updated to 'Open'. Please set the status to 'Closed'.");
+                throw new BadRequestException("The petition status cannot be updated to 'Open'. Please set the status to 'Closed'.");
         log.info("Request: {}", petitionCommitteeDecision);
         PetitionDto petitionUpdated = petitionCommitteeService.updatePetitionWithStatusAndResponse(petitionId, petitionCommitteeDecision);
         ResponseEntity<PetitionDto> response = null;

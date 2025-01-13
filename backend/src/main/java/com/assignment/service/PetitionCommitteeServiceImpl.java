@@ -64,10 +64,6 @@ public class PetitionCommitteeServiceImpl implements PetitionCommitteeService{
         PetitionThresholdEntity petitionThresholdEntity = new PetitionThresholdEntity(1, signatureThreshold);
         petitionThresholdRepository.save(petitionThresholdEntity);
 
-        if (openPetitions.isEmpty()) {
-            return false; // No petitions to update
-        }
-
         for (PetitionEntity petition : openPetitions) {
             petition.setSignatureThreshold(signatureThreshold); // Update the threshold
         }
