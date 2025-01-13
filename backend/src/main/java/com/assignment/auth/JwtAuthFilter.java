@@ -59,7 +59,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         }catch (Exception ex){
-                Cookie cookie = new Cookie(cookieName, null);
+                Cookie cookie = new Cookie("accessToken", null);
                 cookie.setPath("/");
                 cookie.setHttpOnly(false);
                 cookie.setMaxAge(0);
