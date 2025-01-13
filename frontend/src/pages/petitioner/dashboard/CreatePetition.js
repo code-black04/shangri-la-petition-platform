@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import CreatePetitionService from "../dashboard/service/CreatePetitionService.js";
+import MessageBanner from "../../petitioner/signup/MessageBanner.js"
 
 const PetitionFormContainer = styled.div`
   background: #1e1e1e;
@@ -9,7 +10,7 @@ const PetitionFormContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   max-width: 700px;
-  width: 90%; /* Ensure responsiveness */
+  width: 100%; /* Ensure responsiveness */
   margin: 0 auto;
   color: #e0e0e0;
 `;
@@ -103,6 +104,9 @@ const CreatePetition = () => {
   const [petition_title, setPetitionTitle] = useState("");
   const [petition_text, setPetitionText] = useState("");
 
+  const [message, setMessage] = useState(''); // To store success or error message
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("Petition data:", { petition_date, petition_title, petition_text });
@@ -111,14 +115,24 @@ const CreatePetition = () => {
       const petitionCreationResponse = await CreatePetitionService.createPetition(petitionCreationData);
 
       if(petitionCreationResponse.status === 201) {
-        alert("Petition created");
-        setPetitionText("");
-        setPetitionTitle("");
+        setMessageType('success');
+        setMessage("Petition created successfully!");
+
+        setTimeout((() => {
+          setMessage("");
+          setMessageType('');
+          setPetitionText("");
+          setPetitionTitle("");
+        }), 2000);
+        
       } else {
-        alert(await petitionCreationResponse.json());
+        setMessageType('error');
+        setMessage("An expected error occurred, please try again..");
       }
     } catch (error) {
-      console.error("Error in creating petition");
+      console.error(error);
+      setMessageType('error');
+      setMessage("An expected error occurred, please try again..");
     }
   };
 
@@ -129,6 +143,7 @@ const CreatePetition = () => {
 
   return (
     <PetitionFormContainer>
+      <MessageBanner type={messageType} message={message} />
       <FormTitle>Create New Petition</FormTitle>
       <Form onSubmit={handleSubmit}>
         <Label>Date</Label>

@@ -83,12 +83,12 @@ const Analytics = () => {
           throw new Error("Failed to fetch petitions");
         }
         const data = await response.json();
-        setPetitions(data);
+        setPetitions(data.petitions);
 
         // Analytics calculations
-        const open = data.filter((petition) => petition.status === "Open").length;
-        const closed = data.filter((petition) => petition.status === "Closed").length;
-        const totalSignatures = data.reduce((sum, petition) => sum + petition.signature, 0);
+        const open = data.petitions.filter((petition) => petition.status === "Open").length;
+        const closed = data.petitions.filter((petition) => petition.status === "Closed").length;
+        const totalSignatures = data.petitions.reduce((sum, petition) => sum + petition.signature, 0);
 
         setOpenCount(open);
         setClosedCount(closed);

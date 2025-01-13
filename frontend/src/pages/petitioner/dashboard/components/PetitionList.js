@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import GetAllPetitionService from "../service/GetAllPetitionService.js";
 import SignPetitionService from "../service/SignPetitionService.js";
+import { getCurrentUser } from "../../utils/AuthUtils.js";
 
 const PetitionListContainer = styled.div`
   background: #1e1e1e;
@@ -203,12 +204,35 @@ const ErrorMessage = styled.div`
 `;
 
 
+const Notification = styled.div`
+  background-color: ${(props) => (props.type === "success" ? "#4caf50" : "#f44336")};
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  margin: 20px auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+`;
+
 
 const PetitionList = () => {
   const [petitions, setPetitions] = useState([]);
   const [selectedPetition, setSelectedPetition] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [error, setError] = useState(null);
+
+  const [notification, setNotification] = useState("");
+  const [notificationType, setNotificationType] = useState("");
+
+  const currentUserEmail = getCurrentUser();
+
 
   const status = ["All", "Open", "Closed"];
 
@@ -230,6 +254,12 @@ const PetitionList = () => {
     fetchPetitions(selectedStatus);
   }, [selectedStatus]);
 
+  const isPetitionerSigned = (petition) => {
+    return petition.petitionSigningUserEntityList.some(
+      (signingUser) => signingUser.emailId === currentUserEmail
+    );
+  };
+
   const handleViewClick = (petition) => {
     setSelectedPetition(petition); // Set the clicked petition as selected
   };
@@ -237,12 +267,35 @@ const PetitionList = () => {
   const handleSignPetition = async (petitionId) => {
     try {
       await SignPetitionService.signPetition(petitionId);
-      alert("Petition signed successfully!");
-  
-      // Refresh petitions after signing
-      setSelectedStatus("All"); // or re-fetch petitions for the current status
+
+      // Update the specific petition in the local state
+      setPetitions((prevPetitions) =>
+        prevPetitions.map((petition) =>
+          petition.petition_id === petitionId
+            ? {
+                ...petition,
+                signature: petition.signature + 1,
+                petitionSigningUserEntityList: [
+                  ...petition.petitionSigningUserEntityList,
+                  { petition_id: petitionId, emailId: currentUserEmail }, // Add the current user
+                ],
+              }
+            : petition
+        )
+      );
+
+      setNotification("Petition signed successfully!");
+      setNotificationType("success");
+      
+      setSelectedStatus("All");
+
+      setTimeout(() => setNotification(""), 3000);
     } catch (err) {
-      setError(err.message);
+      setNotification("Failed to sign the petition.");
+      setNotificationType("error");
+
+      // Clear notification after 4 seconds
+      setTimeout(() => setNotification(""), 4000);
     }
   };
   
@@ -253,6 +306,7 @@ const PetitionList = () => {
 
   return (
     <PetitionListContainer>
+      {notification && <Notification type={notificationType}>{notification}</Notification>}
       <ListTitle>{selectedStatus} Petitions</ListTitle>
       <ToggleButtonGroup>
         {status.map((status) => (
@@ -294,12 +348,15 @@ const PetitionList = () => {
                     <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
                   </TableCell>
                   <TableCell>
-                    {petition.status === 'Open' && (
-                      <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
-                        Sign
-                      </ViewButton>
-                    )}
-                    {petition.status === 'Closed' && (
+                    {petition.status === "Open" ? (
+                      isPetitionerSigned(petition) ? (
+                        <p>Signed</p>
+                      ) : (
+                        <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
+                          Sign
+                        </ViewButton>
+                      )
+                    ) : (
                       <p>-</p>
                     )}
                   </TableCell>

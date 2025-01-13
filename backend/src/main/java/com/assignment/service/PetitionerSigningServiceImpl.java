@@ -53,15 +53,15 @@ public class PetitionerSigningServiceImpl implements PetitionerSigningService {
     }
 
     @Override
-    public PetitionerDto signUpPetitioner(PetitionerDto petitionerDto) throws DuplicateAccountException {
+    public PetitionerDto signUpPetitioner(PetitionerDto petitionerDto) throws DuplicateAccountException, DuplicateBiometricException {
         if (petitionerRepository.findPetitionerByEmailId(petitionerDto.getEmailId()) != null) {
             log.error("Account with {} already exists. ", petitionerDto.getEmailId());
             throw new DuplicateAccountException("Account with " + petitionerDto.getEmailId() + " already exists. Try again!");
         }
 
         if (petitionerRepository.findPetitionerByBiometricId(petitionerDto.getBiometricId()) != null) {
-            log.error("Account with {} already exists. ", petitionerDto.getBiometricId());
-            throw new DuplicateBiometricException("Account with " + petitionerDto.getBiometricId() + " already in use. Check back!");
+            log.error("Biometric Id: " + petitionerDto.getBiometricId() + " already in use");
+            throw new DuplicateBiometricException("Biometric Id: " + petitionerDto.getBiometricId() + " already in use. Check back!");
         }
 
         PetitionerEntity petitionerEntity = petitionerDtoEntityMapper.convertToPetitionerEntity(petitionerDto);

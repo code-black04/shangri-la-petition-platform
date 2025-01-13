@@ -22,6 +22,15 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DuplicateBiometricException.class)
+    public ResponseEntity<Object> handleBiometricIdAlreadyInUse(DuplicateBiometricException exceptions){
+        ErrorResponse errorResponse = new ErrorResponse(
+                "ERR_BIO_ID_ALREADY_IN_USE",
+                List.of(new ErrorMessage("details", exceptions.getMessage())),
+                LocalDateTime.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Object> handleBadRequest(BadRequestException exceptions){
         ErrorResponse errorResponse = new ErrorResponse(

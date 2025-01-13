@@ -12,7 +12,7 @@ export const SlppSigningContainer = styled.header`
 `;
 
 export const LogoImageContainer = styled.img`
-    height: 8vmin;
+    height: 18vmin;
     pointer-events: none;
     padding-bottom: 20px;
 `;
@@ -81,4 +81,10 @@ export const Button = styled.button`
       color: black;
       box-sizing: border-box;
     }
+`;
+
+export const PageHeader = styled.h1`
+  font-size: 30px;
+  color: Green;
+  margin-bottom: 30px;
 `;

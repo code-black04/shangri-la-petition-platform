@@ -25,7 +25,7 @@ const Sidebar = styled.div`
 `;
 
 export const LogoImageContainer = styled.img`
-  height: 60px;
+  height: 18vmin;
   margin-bottom: 20px;
   align-self: center;
 `;

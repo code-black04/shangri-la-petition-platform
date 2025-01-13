@@ -45,7 +45,7 @@ const RoleCard = styled.div`
 
   &:hover {
     transform: scale(1.05);
-    background-color: #444;
+    background-color: ${({ isSelected }) => (isSelected ? '#333' : '#444')}
   }
 `;
 
@@ -134,7 +134,7 @@ function Welcome() {
 
       <RoleSelectionContainer>
         <RoleCard
-          $isSelected={selectedRole === 'Petitioner'}
+          isSelected={selectedRole === 'Petitioner'}
           onClick={() => handleRoleSelection('Petitioner')}
         >
           <RoleIcon>📜</RoleIcon>
@@ -142,7 +142,7 @@ function Welcome() {
           <RoleDescription>Submit petitions and track their progress.</RoleDescription>
         </RoleCard>
         <RoleCard
-          $isSelected={selectedRole === 'Petitioner Committee'}
+          isSelected={selectedRole === 'Petitioner Committee'}
           onClick={() => handleRoleSelection('Petitioner Committee')}
         >
           <RoleIcon>👥</RoleIcon>
