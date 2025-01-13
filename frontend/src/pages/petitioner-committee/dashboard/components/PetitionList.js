@@ -79,7 +79,7 @@ const PetitionList = () => {
         });
       } else {
         if (data.status === 400) {
-          const errorMessage = "Invalid input for Status or Result.."
+          const errorMessage = "Invalid input for Status or Result or not meet threshold limits.."
           setNotification(errorMessage);
           setTimeout(() => {
             setNotification('');
