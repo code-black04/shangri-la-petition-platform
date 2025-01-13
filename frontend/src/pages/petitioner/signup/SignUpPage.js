@@ -52,7 +52,7 @@ function SignUpPage (){
                         setMessage('');
                       }, 3000);
                   } else {
-                    setMessage('Signup failed. Please try again.');
+                    setMessage(responseBody.responseMessage);
                     setTimeout(() => {
                         setMessage('');
                       }, 3000);
