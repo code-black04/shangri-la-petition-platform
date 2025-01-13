@@ -31,9 +31,9 @@ public class PetitionerDto {
 
     @NotNull
     @NotEmpty
-    @Size(min = 8, max = 20)
+    @Size(min = 6, max = 30)
     @JsonProperty(value = "password", required = true)
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d.*\\d)(?=.*[^a-zA-Z0-9]).{8,20}$")
+//    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d.*\\d)(?=.*[^a-zA-Z0-9]).{8,20}$")
     private String password;
 
     @NotNull

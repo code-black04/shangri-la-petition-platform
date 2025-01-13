@@ -1,5 +1,7 @@
 # Shangri-la Petition platform project Setup Guide
 
+## Open your browser and navigate to `http://localhost/app`.
+
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:
 
@@ -66,5 +68,5 @@ $ ./scripts/cleanup.sh
     emailId = "admin@petition.parliament.sr"
     password = "2025%shangrila"
 ```
-
+- "As authentication is maintained in cookie, please clear the cookie if any error occurs during registration or signing in."
 ---
