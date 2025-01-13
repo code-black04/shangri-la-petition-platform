@@ -29,7 +29,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U slpp-user -d slpp-db"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   api:
     container_name: shangri-la-petition-platform-container
@@ -44,7 +44,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=slpp-user
       - SPRING_DATASOURCE_PASSWORD=slpp-password
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    links:
+        - db
 
   app:
     container_name: shangrila-petition-platform-container

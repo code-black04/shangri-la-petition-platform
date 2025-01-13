@@ -41,7 +41,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             log.error("Sign in was not successful");
             throw new UnauthorizedAccessException("Unauthorized login attempt");
         }
-        // Replace with your custom authentication logic
         PetitionerEntity petitionerByEmailId = userRepository.findPetitionerByEmailId(signingInRequest.getEmailId());
         SimpleGrantedAuthority roleUser = new SimpleGrantedAuthority(Boolean.FALSE.equals(petitionerByEmailId.isCommitteeAdmin()) ? "ROLE_USER" : "ROLE_COMMITTEE");
         return new UsernamePasswordAuthenticationToken(

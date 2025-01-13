@@ -23,7 +23,7 @@ public class AppConfig {
     @Bean
     public ApplicationRunner initializeThreshold() {
         return args -> {
-            if (repository.count() == 0) { // Check if table is empty
+            if (repository.count() == 0) {
                 PetitionThresholdEntity defaultThreshold = new PetitionThresholdEntity(1, 3);
                 repository.save(defaultThreshold);
                 System.out.println("Initialized threshold with value 0.");
