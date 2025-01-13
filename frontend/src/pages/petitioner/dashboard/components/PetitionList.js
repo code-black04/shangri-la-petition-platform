@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import GetAllPetitionService from "../service/GetAllPetitionService.js";
 import SignPetitionService from "../service/SignPetitionService.js";
+import { getCurrentUser } from "../../utils/AuthUtils.js";
 
 const PetitionListContainer = styled.div`
   background: #1e1e1e;
@@ -230,6 +231,8 @@ const PetitionList = () => {
   const [notification, setNotification] = useState("");
   const [notificationType, setNotificationType] = useState("");
 
+  const currentUserEmail = getCurrentUser();
+
 
   const status = ["All", "Open", "Closed"];
 
@@ -251,6 +254,12 @@ const PetitionList = () => {
     fetchPetitions(selectedStatus);
   }, [selectedStatus]);
 
+  const isPetitionerSigned = (petition) => {
+    return petition.petitionSigningUserEntityList.some(
+      (signingUser) => signingUser.emailId === currentUserEmail
+    );
+  };
+
   const handleViewClick = (petition) => {
     setSelectedPetition(petition); // Set the clicked petition as selected
   };
@@ -258,6 +267,22 @@ const PetitionList = () => {
   const handleSignPetition = async (petitionId) => {
     try {
       await SignPetitionService.signPetition(petitionId);
+
+      // Update the specific petition in the local state
+      setPetitions((prevPetitions) =>
+        prevPetitions.map((petition) =>
+          petition.petition_id === petitionId
+            ? {
+                ...petition,
+                signature: petition.signature + 1,
+                petitionSigningUserEntityList: [
+                  ...petition.petitionSigningUserEntityList,
+                  { petition_id: petitionId, emailId: currentUserEmail }, // Add the current user
+                ],
+              }
+            : petition
+        )
+      );
 
       setNotification("Petition signed successfully!");
       setNotificationType("success");
@@ -323,12 +348,15 @@ const PetitionList = () => {
                     <ViewButton onClick={() => handleViewClick(petition)}>View</ViewButton>
                   </TableCell>
                   <TableCell>
-                    {petition.status === 'Open' && (
-                      <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
-                        Sign
-                      </ViewButton>
-                    )}
-                    {petition.status === 'Closed' && (
+                    {petition.status === "Open" ? (
+                      isPetitionerSigned(petition) ? (
+                        <p>Signed</p>
+                      ) : (
+                        <ViewButton onClick={() => handleSignPetition(petition.petition_id)}>
+                          Sign
+                        </ViewButton>
+                      )
+                    ) : (
                       <p>-</p>
                     )}
                   </TableCell>
