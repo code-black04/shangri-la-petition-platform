@@ -3,6 +3,8 @@
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:
 
+### NOTE: To run, the project shell scripts are provides therefore please use linux machine to run the application with simplicity.
+
 1. **Docker**
 2. **Docker Compose**
 3. **Node.js** (v14 or above)
@@ -18,6 +20,8 @@ Navigate to the project directory:
 ```bash
 $ cd ~/CW2_pm455/
 ```
+
+Note: Use main project tree based scripts only.
 
 ### 2. Bootstrap the Environment
 Run the bootstrap script to prepare the environment for backend and frontend:
