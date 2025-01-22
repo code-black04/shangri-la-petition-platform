@@ -1,0 +1,5 @@
+FROM postgres:latest
+ENV POSTGRES_PASSWORD slpp-password
+ENV POSTGRES_DB slpp-db
+ENV POSTGRES_USER slpp-user
+EXPOSE 5432

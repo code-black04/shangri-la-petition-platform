@@ -1,0 +1,68 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+      - api
+
+  db:
+    container_name: shangri-la-petition-platform-postgres-container
+    image: shangri-la-petition-platform-postgres-image
+    build:
+      context: backend/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DB: slpp-db
+      POSTGRES_USER: slpp-user
+      POSTGRES_PASSWORD: slpp-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - "shangri-la-petition-platform-db-data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slpp-user -d slpp-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    container_name: shangri-la-petition-platform-container
+    image: shangri-la-petition-platform-image
+    build:
+      context: backend/docker/tomcat
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://shangri-la-petition-platform-postgres-container:5432/slpp-db
+      - SPRING_DATASOURCE_USERNAME=slpp-user
+      - SPRING_DATASOURCE_PASSWORD=slpp-password
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+        - db
+
+  app:
+    container_name: shangrila-petition-platform-container
+    image: shangrila-petition-platform-image
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - "shangrila_petition_platform_node_modules:/app/node_modules"
+      - "./frontend:/app"
+
+volumes:
+  shangri-la-petition-platform-db-data:
+  shangrila_petition_platform_node_modules:
+      name: shangrila_petition_platform_node_modules_volume
