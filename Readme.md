@@ -20,7 +20,7 @@ Before you begin, ensure you have the following installed on your machine:
 Navigate to the project directory:
 
 ```bash
-$ cd ~/CW2_pm455/
+$ cd ~/shangri-la-petition-platform/
 ```
 
 Note: Use main project tree based scripts only.
